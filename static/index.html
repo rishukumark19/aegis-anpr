@@ -239,10 +239,10 @@
 
   <!-- ═══════════════════════════════════════════ HEADER ═══════════════════════════════════════════ -->
   <header class="sticky top-0 z-50 border-b sep" style="background: rgba(5,8,15,0.95); backdrop-filter: blur(24px);">
-    <div class="w-full max-w-[1800px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+    <div class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
 
       <!-- Brand -->
-      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+      <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
           <i data-lucide="shield-check" class="text-emerald-400" style="width:17px;height:17px;"></i>
         </div>
@@ -255,23 +255,23 @@
         </div>
       </div>
 
+      <!-- Live channel pill visible on ALL screens -->
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+        <span class="text-[10px] sm:text-[10.5px] text-slate-400">Channel:</span>
+        <span class="text-[10.5px] sm:text-[11px] font-semibold text-slate-200 max-w-[120px] xs:max-w-[180px] sm:max-w-[220px] truncate" id="current-channel-label">Main Gate Inbound</span>
+      </div>
+
       <!-- Action buttons -->
       <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-        <!-- Channel label on larger screens -->
-        <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-          <span class="text-[10.5px] text-slate-400">Channel:</span>
-          <span class="text-[10.5px] font-semibold text-slate-200 max-w-[140px] truncate" id="current-channel-label">Loading...</span>
-        </div>
-
         <button onclick="openRtspModal()" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-200 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
           <i data-lucide="sliders-horizontal" style="width:13px;height:13px;color:#22d3ee;"></i>
-          <span class="hidden sm:inline">Connect</span> Stream
+          <span>Connect Stream</span>
         </button>
 
         <a href="/api/export" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-emerald-300 transition" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);">
           <i data-lucide="download" style="width:13px;height:13px;"></i>
-          <span class="hidden sm:inline">CSV</span>
+          <span>CSV</span>
         </a>
       </div>
     </div>
@@ -319,13 +319,19 @@
       <!-- ── LEFT: Live Video Feed (12 cols mobile, 5 cols desktop) ── -->
       <div class="lg:col-span-5 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col">
 
-        <!-- Feed status bar -->
+        <!-- Feed status bar with Camera Flip button -->
         <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot flex-shrink-0"></span>
             <span class="text-[10.5px] sm:text-[11px] font-bold tracking-widest uppercase text-white">Live Camera</span>
           </div>
-          <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLO · PaddleOCR</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="flipCamera()" class="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-cyan-300 transition" style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);" title="Switch camera (Front / Back / Stream)">
+              <i data-lucide="switch-camera" style="width:12px;height:12px;"></i>
+              <span>Flip Camera</span>
+            </button>
+            <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full hidden xs:inline" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLO · OCR</span>
+          </div>
         </div>
 
         <!-- 1-Click Stream switch buttons (Responsive flex wrap) -->
@@ -334,7 +340,7 @@
           <div class="flex flex-wrap gap-1.5 sm:gap-2">
             <button class="feed-btn feed-btn-webcam" onclick="switchStream('0', 'Laptop Webcam')">
               <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              <span>Webcam</span>
+              <span>Webcam (0)</span>
             </button>
             <button class="feed-btn feed-btn-cctv" onclick="openRtspModal()">
               <i data-lucide="cctv" style="width:13px;height:13px;"></i>
@@ -372,7 +378,7 @@
         <div class="px-3.5 py-2 flex items-start gap-2 border-t sep" style="background:rgba(14,165,233,0.04);">
           <i data-lucide="lightbulb" style="width:13px;height:13px;color:#22d3ee;flex-shrink:0;margin-top:2px;"></i>
           <p class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
-            <span class="text-cyan-300 font-semibold">Test with Phone:</span> Switch to <em>Webcam</em> and show a number plate on your phone.
+            <span class="text-cyan-300 font-semibold">Tip:</span> Use <strong>Flip Camera</strong> above to cycle cameras or switch to camera index 1.
           </p>
         </div>
 
@@ -496,7 +502,7 @@
             class="w-full text-xs font-mono text-slate-200 rounded-lg px-3 py-2 focus:outline-none transition"
             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"
           />
-          <p class="text-[10px] text-slate-500 mt-1">Enter <code class="text-slate-400">0</code> for Webcam, or paste your RTSP stream link.</p>
+          <p class="text-[10px] text-slate-500 mt-1">Enter <code class="text-slate-400">0</code> or <code class="text-slate-400">1</code> for Webcams, or paste your RTSP stream link.</p>
         </div>
 
         <div>
@@ -548,6 +554,13 @@
   <!-- ════════════════════════ APPLICATION SCRIPTS ════════════════════════ -->
   <script>
     lucide.createIcons();
+
+    // ─── Camera Flip State ──────────────────────────────────────
+    let activeCamIndex = 0;
+    function flipCamera() {
+      activeCamIndex = activeCamIndex === 0 ? 1 : 0;
+      switchStream(activeCamIndex.toString(), `Camera Device ${activeCamIndex}`);
+    }
 
     // ─── Formatting Helpers ─────────────────────────────────────
     function confColor(c) {

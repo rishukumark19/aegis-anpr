@@ -91,6 +91,8 @@ This document serves as the comprehensive log of everything built, tested, debug
 
 2. **Mobile & Tablet Responsive Redesign (Zero Overflow)**:
    - Root containment: enforced `max-w-[100vw]` and `overflow-x-hidden` across HTML/body to completely prevent horizontal scrolling and layout breakage on mobile screens (320px–480px).
+   - Header & Channel Visibility: ensured `Channel: Main Gate Inbound` status pill, `Connect Stream`, and `CSV / Scan` buttons remain visible across mobile, tablet, and desktop without clipping.
+   - Live Camera Flip: added a 1-click **Flip Camera** button in the video feed toolbar (`flipMobileCamera` on GitHub Pages to toggle `user` (Front) and `environment` (Back) lenses; and camera index flipping on local OpenCV).
    - KPI Stats: responsive grid `grid-cols-2 md:grid-cols-4` with adaptive font sizes (`text-xl sm:text-3xl`).
    - Adaptive video canvas: dynamic aspect ratio (`aspect-[4/3] xs:aspect-video sm:aspect-video`) with touch-friendly stream selector buttons.
    - Flexible dossier cards: multi-row wrapping for thumbnails, HSRP plates, and confidence progress bars on mobile viewports.

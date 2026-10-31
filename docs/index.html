@@ -117,7 +117,7 @@
 
     @media (min-width: 640px) {
       .hsrp-plate .plate-chars { font-size: 16px; }
-      .hsrp-plate.large .plate-chars { font-size: 21px; }
+      .hsrp-plate.large .plate-chars { font-size: 22px; }
       .hsrp-plate.large .ind-strip { min-height: 34px; font-size: 9px; }
     }
 
@@ -208,16 +208,19 @@
 <body class="text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
 
   <!-- TOP NOTICE BAR -->
-  <div class="px-4 py-2 text-center text-[10.5px] sm:text-[11px] font-medium bg-gradient-to-r from-emerald-950/80 via-slate-900 to-cyan-950/80 border-b sep flex items-center justify-center gap-2 flex-wrap">
-    <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-    <span class="text-slate-300">Interactive Cloud Demo Mode</span>
-    <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="text-emerald-400 underline font-semibold hover:text-emerald-300 ml-1">GitHub Repo</a>
+  <div class="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-[11px] font-medium bg-gradient-to-r from-emerald-950/80 via-slate-900 to-cyan-950/80 border-b sep flex items-center justify-between sm:justify-center gap-2">
+    <div class="flex items-center gap-1.5 truncate">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+      <span class="text-slate-300 truncate">Interactive Demo Showcase</span>
+    </div>
+    <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="text-emerald-400 underline font-semibold hover:text-emerald-300 ml-1 flex-shrink-0 text-[10px]">GitHub Repo</a>
   </div>
 
   <!-- HEADER -->
   <header class="sticky top-0 z-50 border-b sep" style="background: rgba(5,8,15,0.95); backdrop-filter: blur(24px);">
-    <div class="w-full max-w-[1800px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+    <div class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand -->
+      <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
           <i data-lucide="shield-check" class="text-emerald-400" style="width:17px;height:17px;"></i>
         </div>
@@ -230,6 +233,14 @@
         </div>
       </div>
 
+      <!-- Live channel pill visible on ALL screens -->
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+        <span class="text-[10px] sm:text-[10.5px] text-slate-400">Channel:</span>
+        <span class="text-[10.5px] sm:text-[11px] font-semibold text-slate-200 max-w-[120px] xs:max-w-[180px] sm:max-w-[220px] truncate" id="current-channel-label">Gate 01 Inbound</span>
+      </div>
+
+      <!-- Header actions -->
       <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
         <button onclick="triggerSimulatedDetection()" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-bold text-slate-950 transition" style="background:linear-gradient(135deg,#10b981,#059669);">
           <i data-lucide="sparkles" style="width:12px;height:12px;"></i>
@@ -281,7 +292,13 @@
             <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot flex-shrink-0"></span>
             <span class="text-[10.5px] sm:text-[11px] font-bold tracking-widest uppercase text-white">Live Camera</span>
           </div>
-          <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLOv8 + OCR</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="flipMobileCamera()" class="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-cyan-300 transition" style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);" title="Switch camera (Front / Back)">
+              <i data-lucide="switch-camera" style="width:12px;height:12px;"></i>
+              <span>Flip Camera</span>
+            </button>
+            <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full hidden xs:inline" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLOv8 + OCR</span>
+          </div>
         </div>
 
         <div class="px-3 sm:px-4 py-2.5 border-b sep" style="background:rgba(5,8,15,0.4);">
@@ -306,7 +323,7 @@
               <i data-lucide="cctv" style="width:26px;height:26px;color:#34d399;"></i>
             </div>
             <p class="text-xs sm:text-sm font-bold text-white">Live Camera Preview</p>
-            <p class="text-[10.5px] sm:text-xs text-slate-400 max-w-xs mx-auto">Click <strong>Use Webcam</strong> to test phone recognition, or watch simulated events.</p>
+            <p class="text-[10.5px] sm:text-xs text-slate-400 max-w-xs mx-auto">Click <strong>Use Webcam</strong> to test phone recognition, or use <strong>Flip Camera</strong> on phones.</p>
           </div>
 
           <div class="scan-overlay"></div>
@@ -410,6 +427,14 @@
 
   <script>
     lucide.createIcons();
+
+    let currentFacingMode = 'user'; // 'user' (front) or 'environment' (back)
+    let currentMediaStream = null;
+
+    async function flipMobileCamera() {
+      currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+      startWebcam();
+    }
 
     const sampleVehicles = [
       {
@@ -592,14 +617,19 @@
     async function startWebcam() {
       const video = document.getElementById('live-video');
       const placeholder = document.getElementById('video-placeholder');
+      if (currentMediaStream) {
+        currentMediaStream.getTracks().forEach(track => track.stop());
+      }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-        video.srcObject = stream;
+        currentMediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: currentFacingMode }
+        });
+        video.srcObject = currentMediaStream;
         video.classList.remove('hidden');
         placeholder.classList.add('hidden');
-        document.getElementById('player-label').innerText = 'Webcam (Active)';
+        document.getElementById('player-label').innerText = `Camera (${currentFacingMode === 'user' ? 'Front' : 'Back'}) Active`;
       } catch (err) {
-        alert('Webcam permission not granted or camera unavailable.');
+        alert('Camera access denied or camera not found.');
       }
     }
 
