@@ -1,0 +1,962 @@
+# PROJECT RESEARCH & DEVELOPMENT BRIEF
+# AI-Powered Vehicle Identification & Monitoring System (ANPR)
+
+## 1. PROJECT BACKGROUND
+
+We currently operate a camera/CCTV-related business and want to expand into AI-powered surveillance and vehicle identification solutions.
+
+The proposed product is an Automatic Number Plate Recognition (ANPR) system designed primarily for Indian vehicles.
+
+The objective is to use existing CCTV/IP cameras wherever possible, identify vehicles automatically, extract their registration numbers, and maintain a searchable database of vehicle movements.
+
+We want to develop this into a product that can eventually be installed and sold to:
+
+- Apartments and gated communities.
+- Commercial buildings and offices.
+- Hotels and hospitals.
+- Shopping malls and parking facilities.
+- Industrial premises.
+- Private campuses and other secured properties.
+
+### Primary business objective
+
+Instead of selling only CCTV cameras and installation services, we want to offer a complete smart surveillance solution with AI-based vehicle identification, monitoring, reporting and access management.
+
+---
+
+## 2. WHAT WE WANT TO BUILD
+
+The system should perform the following workflow:
+
+1. An IP camera continuously captures vehicles.
+2. The system receives the camera's video stream.
+3. AI detects a vehicle.
+4. AI identifies the number plate.
+5. OCR extracts the registration number.
+6. The system validates and corrects common character recognition errors.
+7. The system records the vehicle's information.
+8. A dashboard allows an administrator to search and monitor vehicle activity.
+
+Example:
+
+A car enters a gated community.
+
+The system automatically records:
+
+- Registration number: KA03MN1234
+- Date: 31 October 2026
+- Entry time: 10:42:15 AM
+- Camera: Main Gate Camera 01
+- Vehicle type: Car
+- Captured vehicle image.
+- Captured number plate image.
+- Recognition confidence.
+- Entry/exit status, if supported by the installation.
+
+The administrator should be able to search for KA03MN1234 and see its previous recorded movements.
+
+Important: The system must distinguish between a detected plate and a verified registration number. A syntactically valid number is not necessarily a correctly recognized number.
+
+---
+
+## 3. EXISTING OPEN-SOURCE PROJECTS TO INVESTIGATE
+
+We do not want to build everything from scratch.
+
+First, investigate existing GitHub projects, their source code, pretrained weights, documentation, dependencies, licensing and actual working condition.
+
+The goal is to reuse suitable existing implementations wherever possible.
+
+### A. Indian Number Plate Recognition
+
+GitHub:
+https://github.com/subash9940/indian-number-plate-recognition
+
+What it offers:
+
+- Indian number plate detection.
+- YOLO-based plate detection.
+- ByteTrack vehicle tracking.
+- Fine-tuned TrOCR for Indian plate reading.
+- Indian registration format correction.
+- Multiple-frame OCR voting.
+- Video processing.
+- CSV output.
+
+Why investigate:
+
+This is particularly relevant because it is designed for Indian registration plates rather than generic international plates.
+
+Important restrictions:
+
+- The repository uses AGPL-3.0.
+- Its fine-tuned TrOCR weights are marked non-commercial due to the training dataset's licensing.
+- Its published OCR evaluation uses a small test set and is not a production accuracy guarantee.
+
+Do not use its existing OCR weights commercially without appropriate permission.
+
+### B. Indian ANPR – ByteTrack + FastAPI
+
+GitHub:
+https://github.com/bhavyabundela06/Indian-ANPR-ByteTrack-FastAPI
+
+What it offers:
+
+- Indian vehicle number plate recognition.
+- YOLO-based detection.
+- ByteTrack vehicle tracking.
+- PaddleOCR integration.
+- Indian registration format correction.
+- FastAPI backend.
+- SQLite database.
+- Streamlit dashboard.
+- RTSP camera configuration.
+- Vehicle detection logs.
+
+Why investigate:
+
+This project already has several elements of the system we eventually want to build.
+
+It can help us understand how the recognition engine, backend and dashboard communicate.
+
+Known limitations mentioned by its author:
+
+- Prototype rather than production-ready.
+- No authentication on its API endpoints.
+- Incomplete vehicle metadata persistence.
+- Single-threaded processing.
+- Limited production scalability.
+- Hardware requirements need testing.
+
+Treat it as a reference implementation, not a finished product.
+
+### C. ANPR India
+
+GitHub:
+https://github.com/vrajiah/ANPR-India
+
+What it offers:
+
+- YOLOv5 number plate detection.
+- PaddleOCR text recognition.
+- NorFair vehicle tracking.
+- Indian number plate validation.
+- Video and image processing.
+- CSV output.
+- Streamlit web interface.
+- Docker deployment configuration.
+
+Why investigate:
+
+This is another useful end-to-end implementation that combines detection, OCR, tracking and basic reporting.
+
+The repository declares MIT licensing. However, independently verify the licences of its bundled and external dependencies, pretrained weights and training datasets before commercial reuse.
+
+### D. OpenALPR
+
+GitHub:
+https://github.com/openalpr/openalpr
+
+What it offers:
+
+- Open-source ANPR engine.
+- C++ implementation.
+- Image and video processing.
+- Python, Node.js, Java, Go and other bindings.
+- Existing recognition infrastructure.
+
+Why investigate:
+
+It is an established ANPR project and can be useful for understanding existing recognition implementations.
+
+Limitations:
+
+- Its main repository is older.
+- Its original recognition pipeline is not specifically optimized for modern Indian registration plates.
+- It uses AGPL-3.0 licensing.
+- Commercial licensing and compatibility need careful evaluation.
+
+Do not automatically select it as our primary engine.
+
+---
+
+## 4. OPEN-SOURCE TECHNOLOGIES TO INVESTIGATE
+
+We should evaluate individual components separately instead of assuming one GitHub repository is the final answer.
+
+### A. Computer Vision and Detection
+
+**YOLO**
+
+Purpose:
+- Detect vehicles.
+- Detect number plates.
+- Identify bounding boxes.
+- Process video frames.
+
+Documentation:
+https://docs.ultralytics.com/
+
+GitHub:
+https://github.com/ultralytics/ultralytics
+
+Important licensing consideration:
+
+Ultralytics offers AGPL-3.0 and Enterprise licensing. Its official guidance states that proprietary commercial deployments require an Enterprise licence unless the applicable AGPL obligations are met.
+
+Do not build a closed-source commercial product around Ultralytics without first resolving this licensing issue.
+
+Investigate alternative detection frameworks and models with commercially compatible licences.
+
+### B. OCR – Optical Character Recognition
+
+**PaddleOCR**
+
+GitHub:
+https://github.com/PaddlePaddle/PaddleOCR
+
+Purpose:
+- Extract characters from number plate images.
+- Recognize letters and numbers.
+- Process cropped plate images.
+- Provide confidence information.
+
+Why investigate:
+
+- Apache-2.0 licensed project.
+- Can run locally.
+- No requirement to pay a hosted OCR API when self-hosted.
+- Supports multiple languages and text recognition workflows.
+
+Check the exact model weights and dependencies selected.
+
+### C. Image Processing
+
+**OpenCV**
+
+GitHub:
+https://github.com/opencv/opencv
+
+Documentation:
+https://docs.opencv.org/
+
+Purpose:
+- Read video streams.
+- Extract frames.
+- Crop number plates.
+- Resize images.
+- Improve contrast.
+- Reduce image noise.
+- Process night-time footage.
+- Prepare images for OCR.
+
+OpenCV 4.5.0 and later uses Apache-2.0 licensing.
+
+### D. Vehicle Tracking
+
+**ByteTrack**
+
+GitHub:
+https://github.com/ifzhang/ByteTrack
+
+Purpose:
+- Track a vehicle across multiple frames.
+- Avoid repeatedly counting the same vehicle.
+- Associate multiple plate readings with one vehicle track.
+- Improve recognition through multiple observations.
+
+Verify the repository's licence and compatibility with the selected detection framework.
+
+### E. Backend and Database
+
+Investigate:
+
+- Python.
+- FastAPI.
+- PostgreSQL.
+- SQLAlchemy.
+- Redis, if required for background processing.
+- WebSockets for live dashboard updates.
+
+### F. Frontend
+
+Investigate:
+
+- React.
+- TypeScript.
+- Tailwind CSS.
+- Recharts for analytics.
+- WebSockets for live updates.
+
+The dashboard should be simple enough for non-technical property managers and security staff.
+
+---
+
+## 5. CAMERA AND HARDWARE REQUIREMENTS
+
+A major requirement is compatibility with cameras we already sell or install.
+
+We should investigate whether an ordinary IP CCTV camera can be used without purchasing a dedicated ANPR camera.
+
+### Camera compatibility
+
+Investigate:
+
+- RTSP video stream support.
+- ONVIF compatibility.
+- IP camera integration.
+- Main stream and sub-stream support.
+- Camera authentication.
+- Multiple camera connections.
+- Network connectivity.
+- Recording/NVR integration.
+
+The system should preferably support existing cameras from brands such as:
+
+- Hikvision.
+- CP Plus.
+- Dahua.
+- Other RTSP/ONVIF-compatible IP cameras.
+
+Do not assume every camera from these manufacturers supports every required feature.
+
+### Camera positioning and specifications
+
+Investigate the importance of:
+
+- Camera resolution.
+- Lens and focal length.
+- Shutter speed.
+- Vehicle speed.
+- Capture distance.
+- Camera angle.
+- IR illumination.
+- Day/night performance.
+- Motion blur.
+- Weather conditions.
+- Plate size in the captured frame.
+
+A dedicated ANPR camera may be necessary for certain installations.
+
+We should compare the cost and performance of ordinary CCTV cameras against dedicated ANPR cameras.
+
+### Development hardware
+
+Our available development laptop:
+
+- Windows 11.
+- AMD Ryzen 7 8845HS.
+- NVIDIA RTX 4060 Laptop GPU.
+- 8 GB VRAM.
+- Radeon 780M integrated graphics.
+
+Use this machine for the initial development and testing.
+
+Evaluate CUDA compatibility, VRAM requirements, model size and performance.
+
+Do not assume a system requiring 16–32 GB VRAM is necessary without benchmarking a smaller configuration first.
+
+## 6. PROPOSED SOFTWARE ARCHITECTURE
+
+We want a modular architecture that allows us to replace individual AI models without rebuilding the complete application.
+
+Proposed architecture:
+
+CAMERA / NVR
+↓
+RTSP VIDEO STREAM
+↓
+VIDEO CAPTURE SERVICE (Python + OpenCV)
+↓
+VEHICLE DETECTION
+↓
+NUMBER PLATE DETECTION
+↓
+PLATE IMAGE CROPPING AND PREPROCESSING
+↓
+OCR RECOGNITION
+↓
+INDIAN REGISTRATION FORMAT VALIDATION
+↓
+MULTI-FRAME TRACKING AND CONFIDENCE SCORING
+↓
+BACKEND API (FastAPI)
+↓
+DATABASE (PostgreSQL)
+↓
+REACT ADMIN DASHBOARD
+
+### Important architectural decisions
+
+1. Camera capture and AI inference should be separate services.
+2. The application should support multiple cameras.
+3. Processing should happen locally wherever possible.
+4. The system should not depend on paid cloud APIs.
+5. The recognition engine should be replaceable.
+6. The database should retain both the recognized number and supporting evidence.
+7. The system should not save every frame unnecessarily.
+8. The application should support both recorded video and live camera streams.
+9. Backend and frontend should communicate through documented APIs.
+10. The application should support future deployment on an on-premise server.
+
+Do not unnecessarily introduce microservices, Kubernetes or complicated infrastructure for the first prototype.
+
+---
+
+## 7. EXPECTED APPLICATION FEATURES
+
+### A. Dashboard
+
+Create a clean administrative dashboard showing:
+
+- Total vehicles detected.
+- Vehicles detected today.
+- Unique vehicles today.
+- Current camera status.
+- Recent vehicle detections.
+- Entry and exit counts.
+- Recognition failures.
+- Camera connection status.
+
+### B. Live Camera Monitoring
+
+- Display connected camera feeds.
+- Show detected vehicles.
+- Highlight detected number plates.
+- Display recognized registration numbers.
+- Display confidence scores.
+- Show camera name and location.
+- Indicate offline cameras.
+- Allow administrators to select individual cameras.
+
+### C. Vehicle Detection Logs
+
+Every detection should be recorded with:
+
+- Unique detection ID.
+- Registration number.
+- Timestamp.
+- Camera ID.
+- Vehicle type, if available.
+- Vehicle image.
+- Number plate crop.
+- OCR confidence.
+- Detection confidence.
+- Tracking ID.
+- Validation status.
+- Entry/exit direction, if determined.
+
+### D. Vehicle Search
+
+Administrators should be able to:
+
+- Search by complete registration number.
+- Search partial registration numbers.
+- Filter by camera.
+- Filter by date.
+- Filter by time.
+- View previous detections.
+- View associated images.
+- Export records to CSV.
+
+### E. Vehicle History
+
+When searching for a vehicle, display its recorded activity.
+
+Example:
+
+KA03MN1234
+
+| Date | Time | Camera | Event |
+|---|---|---|---|
+| 31 Oct | 10:42 AM | Main Gate | Entry |
+| 31 Oct | 6:15 PM | Main Gate | Exit |
+| 1 Nov | 9:05 AM | Main Gate | Entry |
+
+Only classify events as entry or exit when camera placement or direction logic supports that conclusion.
+
+### F. Watchlist and Alerts
+
+Allow administrators to add selected registration numbers to a watchlist.
+
+Possible functionality:
+
+- Alert when a watchlisted vehicle is detected.
+- Maintain a list of authorized vehicles.
+- Identify vehicles not present in the authorized list.
+- Show repeat detections.
+- Configure notification preferences.
+
+These features must be permission-controlled and used only for legitimate, authorized security purposes.
+
+### G. Reports and Analytics
+
+- Daily vehicle count.
+- Monthly vehicle count.
+- Vehicle movement by time.
+- Camera-wise activity.
+- Most frequently detected vehicles.
+- Entry/exit statistics.
+- Failed recognition statistics.
+- Exportable reports.
+
+### H. Camera Management
+
+- Add a camera.
+- Edit camera details.
+- Configure RTSP URL.
+- Set camera location.
+- Set camera name.
+- Configure entry/exit direction.
+- Test connection.
+- Enable/disable camera.
+- Monitor stream status.
+
+Camera credentials must be encrypted or securely managed, not stored in frontend code or publicly exposed configuration files.
+
+---
+
+## 8. IMPORTANT INDIAN NUMBER PLATE REQUIREMENTS
+
+The system must be optimized for Indian registration plates.
+
+Investigate the following formats and variations:
+
+- Standard state registration plates.
+- Two-letter state codes.
+- Different RTO code lengths.
+- Private vehicles.
+- Commercial vehicles.
+- Bharat Series (BH).
+- Temporary registration plates.
+- Two-line number plates.
+- Different plate colours.
+- Motorcycles and scooters.
+- Cars, buses and trucks.
+
+The recognition system should not simply reject a plate because it does not match one standard regular expression.
+
+Implement validation as a configurable layer, with support for different legitimate formats.
+
+Investigate common OCR character confusion:
+
+- O and 0.
+- I and 1.
+- B and 8.
+- S and 5.
+- Z and 2.
+
+Use multiple frames to improve recognition confidence.
+
+Do not automatically change an uncertain registration number without retaining the original OCR output.
+
+---
+
+## 9. TESTING AND PERFORMANCE REQUIREMENTS
+
+This is one of the most important parts of the project.
+
+A model that reads a few static photographs is not necessarily suitable for a real CCTV installation.
+
+We need to test:
+
+### Different lighting conditions
+
+- Bright daylight.
+- Direct sunlight.
+- Shadows.
+- Low light.
+- Complete darkness.
+- IR illumination.
+- Headlights pointing towards the camera.
+
+### Different vehicle conditions
+
+- Stationary vehicles.
+- Slowly moving vehicles.
+- Fast-moving vehicles.
+- Motorcycles.
+- Cars.
+- Commercial vehicles.
+- Partially obstructed plates.
+- Dirty or damaged plates.
+
+### Different camera conditions
+
+- Different camera resolutions.
+- Different capture distances.
+- Different camera angles.
+- Different focal lengths.
+- Different video frame rates.
+- Different compression levels.
+
+### Metrics to measure
+
+- Plate detection precision.
+- Plate detection recall.
+- OCR exact-match accuracy.
+- Character-level accuracy.
+- False recognition rate.
+- Missed plate rate.
+- Processing FPS.
+- End-to-end recognition latency.
+- GPU and CPU utilization.
+- Performance with multiple cameras.
+
+Important: Separate detection accuracy from OCR accuracy.
+
+A correct OCR result on a manually cropped plate does not prove that the entire camera-to-recognition pipeline works accurately.
+
+Build a labelled test dataset using authorized Indian vehicle footage.
+
+---
+
+## 10. SECURITY, PRIVACY AND LEGAL REQUIREMENTS
+
+This product processes vehicle registration numbers and potentially identifiable footage.
+
+Research applicable Indian privacy and data-protection requirements, including the Digital Personal Data Protection Act and applicable rules.
+
+The application should support:
+
+- Authorized camera access.
+- User authentication.
+- Role-based permissions.
+- Secure password storage.
+- Encrypted communication.
+- Secure camera credentials.
+- Audit logs.
+- Configurable footage retention.
+- Configurable plate-record retention.
+- Secure deletion.
+- Restricted access to vehicle search.
+- Protection against unauthorized API access.
+
+Avoid collecting unnecessary personal information.
+
+Do not assume that a registration number can be used to retrieve an owner's identity from a public API. Do not attempt unauthorized access to government vehicle-registration databases.
+
+The initial system should identify and record plates from authorized camera footage, not identify vehicle owners.
+
+---
+
+## 11. DEPLOYMENT OPTIONS
+
+Investigate two deployment models.
+
+### Option A: Local / On-Premise Deployment
+
+The software runs on a computer or server installed at the customer's premises.
+
+Advantages:
+
+- No compulsory cloud subscription.
+- Video remains within the customer's network.
+- Local processing.
+- Lower ongoing cloud costs.
+- Works without continuous internet access.
+
+This should be the first deployment model to investigate.
+
+### Option B: Cloud-Connected Deployment
+
+The AI engine runs locally, but the dashboard and selected records can be accessed remotely through a secure cloud-connected system.
+
+Possible advantages:
+
+- Central management.
+- Multiple customer installations.
+- Remote monitoring.
+- Centralized reports.
+- Subscription-based software model.
+
+Do not stream all raw camera footage to the cloud unnecessarily.
+
+Design the application so cloud connectivity can be added later.
+
+---
+
+## 12. COMMERCIAL AND LICENSING RESEARCH
+
+This is a mandatory research task before we select any library or model.
+
+For every proposed GitHub repository, model and dataset, document:
+
+1. Repository URL.
+2. Latest meaningful commit.
+3. Whether the project is maintained.
+4. Software licence.
+5. Model-weight licence.
+6. Dataset licence.
+7. Commercial-use permission.
+8. Attribution requirements.
+9. Source-disclosure requirements.
+10. Whether redistribution is allowed.
+11. Whether modifications can remain private.
+12. Hardware requirements.
+
+Prioritize:
+
+- MIT.
+- Apache-2.0.
+- BSD licences.
+- Other licences that explicitly permit our intended commercial deployment.
+
+Be careful with:
+
+- AGPL.
+- GPL.
+- Non-commercial datasets.
+- Non-commercial pretrained model weights.
+- Custom research licences.
+- Repositories with missing licence files.
+
+Do not conclude that an entire project is commercially usable just because its main repository has an MIT or Apache licence.
+
+Create a dependency and model licence inventory.
+
+If licensing is uncertain, flag it rather than assuming permission.
+
+---
+
+## 13. BUSINESS MODEL WE WANT TO EXPLORE
+
+We eventually want to offer this as an additional product under our existing camera business.
+
+Possible revenue streams:
+
+1. Camera and hardware sales.
+2. ANPR software installation.
+3. One-time setup charges.
+4. Annual maintenance contracts.
+5. Software subscriptions.
+6. Multi-camera installation packages.
+7. Custom parking management integrations.
+8. Automatic boom barrier integrations.
+
+We should investigate pricing models without committing to a price before the prototype is tested.
+
+Potential product packages:
+
+- Basic: One camera and number plate logging.
+- Standard: Multiple cameras, search and reports.
+- Advanced: Watchlists, alerts and entry/exit automation.
+- Enterprise: Multi-location monitoring and centralized management.
+
+These are proposed packages, not finalized product specifications.
+
+---
+
+## 14. DEVELOPMENT ROADMAP
+
+### Phase 1 — Research and feasibility
+
+- Inspect all the listed GitHub projects.
+- Verify their licences.
+- Identify the best Indian ANPR implementation.
+- Compare detection and OCR models.
+- Verify GPU requirements.
+- Identify compatible camera streams.
+- Select a minimum-cost technology stack.
+
+Deliverable: Research report and recommended technical architecture.
+
+### Phase 2 — Basic working prototype
+
+- Connect one existing CCTV camera or recorded video.
+- Read the RTSP stream.
+- Detect vehicles and number plates.
+- Extract registration numbers.
+- Display detection results.
+- Save plate images.
+- Save timestamps.
+- Export results to CSV.
+
+Deliverable: Working local ANPR application.
+
+### Phase 3 — Backend and dashboard
+
+- FastAPI backend.
+- PostgreSQL database.
+- React dashboard.
+- Camera management.
+- Vehicle search.
+- Detection history.
+- Basic analytics.
+
+Deliverable: Usable administration application.
+
+### Phase 4 — Real-world testing
+
+- Install at one controlled location.
+- Test day and night.
+- Test different vehicle types.
+- Test multiple vehicles.
+- Measure accuracy.
+- Identify failure conditions.
+- Optimize camera positioning and AI processing.
+
+Deliverable: Performance and feasibility report.
+
+### Phase 5 — Commercial-ready product
+
+- Multiple customers.
+- Multiple camera installations.
+- Role-based authentication.
+- Secure deployment.
+- Watchlists and alerts.
+- Reports and exports.
+- Backup and retention management.
+- Installation documentation.
+- Maintenance procedures.
+
+Deliverable: First commercially deployable version, subject to licensing and legal review.
+
+---
+
+## 15. WHAT I WANT ANTIGRAVITY TO DO FIRST
+
+Do not immediately start building the entire application.
+
+Act as a senior computer vision engineer, AI architect and technical product researcher.
+
+Your first responsibility is to research and evaluate the available options.
+
+Perform the following tasks in order:
+
+### Task 1: Inspect existing GitHub projects
+
+Open and inspect all the repositories listed in this brief.
+
+Do not rely only on README descriptions.
+
+Inspect their actual source code, dependencies, pretrained model availability, installation requirements, licences and known limitations.
+
+Determine which projects can actually run on Windows 11 with an NVIDIA RTX 4060 Laptop GPU (8 GB VRAM).
+
+### Task 2: Find additional open-source alternatives
+
+Search GitHub and relevant documentation for:
+
+- Indian number plate detection models.
+- Indian ANPR systems.
+- Open-source OCR models.
+- Open-source vehicle detection models.
+- Open-source vehicle tracking systems.
+- RTSP camera integration libraries.
+- Local ANPR applications.
+- Multi-camera surveillance projects.
+
+Do not limit the research to the projects listed above.
+
+### Task 3: Compare the available approaches
+
+Compare at least three possible architectures:
+
+A. Reuse a complete existing Indian ANPR project.
+
+B. Combine independently selected detection, OCR and tracking components.
+
+C. Develop a custom Indian ANPR pipeline using suitable open-source models.
+
+Compare accuracy potential, development effort, licensing, GPU requirements, maintainability and commercial suitability.
+
+### Task 4: Recommend the best technology stack
+
+Recommend the best combination of:
+
+- Camera integration.
+- Video processing.
+- Vehicle detection.
+- Number plate detection.
+- OCR.
+- Tracking.
+- Backend.
+- Database.
+- Frontend.
+- Local deployment.
+
+Explain why each component is selected.
+
+### Task 5: Verify commercial feasibility
+
+Identify which components can be used commercially without purchasing a proprietary licence.
+
+Clearly distinguish:
+
+- Free for experimentation.
+- Free for commercial use.
+- Free only under copyleft obligations.
+- Non-commercial only.
+- Requires separate permission.
+- Unclear licensing.
+
+### Task 6: Prepare a minimal proof of concept
+
+Before developing the full product, propose a minimal implementation that:
+
+1. Reads one CCTV RTSP stream or video file.
+2. Detects vehicles.
+3. Detects their number plates.
+4. Reads the plate text.
+5. Uses multiple frames where useful.
+6. Saves results.
+7. Displays the annotated output.
+8. Generates a CSV containing recognition results.
+
+The first version should work locally.
+
+### Task 7: Prepare the implementation plan
+
+Provide:
+
+- Folder structure.
+- Dependency list.
+- Environment setup.
+- Model download requirements.
+- Installation instructions.
+- Backend architecture.
+- API design.
+- Database schema.
+- Frontend architecture.
+- Testing strategy.
+- Deployment requirements.
+
+Do not hardcode the AI model or database implementation unnecessarily. Keep the system modular.
+
+---
+
+## 16. IMPORTANT DEVELOPMENT RULES
+
+- Do not purchase paid ANPR APIs initially.
+- Do not use paid cloud recognition services.
+- Do not train models from scratch unless testing demonstrates that existing models are insufficient.
+- Prefer locally hosted AI models.
+- Reuse existing GitHub implementations where legally and technically suitable.
+- Prioritize Indian number plate recognition.
+- Support existing IP cameras wherever possible.
+- Design for future multi-camera installations.
+- Avoid unnecessary infrastructure and complexity.
+- Do not claim accuracy without measured results.
+- Do not use non-commercial model weights in a commercial product.
+- Keep all credentials and camera URLs secure.
+- Maintain clear technical documentation.
+
+## FINAL EXPECTED OUTPUT FROM ANTIGRAVITY
+
+Before writing the actual application, produce these deliverables:
+
+1. **Open-source research report:** All useful GitHub projects, models and libraries.
+2. **Licensing report:** Which components can legally be used for commercial deployment.
+3. **Technology comparison:** At least three possible architectures.
+4. **Recommended architecture:** The best practical solution for our business.
+5. **Hardware report:** Camera compatibility and GPU requirements.
+6. **Cost report:** Expected initial hardware and infrastructure costs, separating free software from hardware expenses.
+7. **Proof-of-concept plan:** Exact scope and test procedure.
+8. **Development roadmap:** Step-by-step implementation plan.
+9. **Risk assessment:** Technical, licensing, privacy and deployment risks.
+
+After these deliverables are ready, present the recommendation and wait for approval before beginning full application development.
+
+**Our main goal is to build a reliable, commercially viable Indian ANPR solution using existing open-source technology wherever possible, while minimizing initial investment and avoiding unnecessary licensing costs.**
+
