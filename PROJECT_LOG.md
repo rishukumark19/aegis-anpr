@@ -89,9 +89,29 @@ This document serves as the comprehensive log of everything built, tested, debug
    - Audit Log Table:
      - Real-time search by plate number or state code, alert toggling, and image click-to-zoom lightbox modal.
 
+2. **Mobile & Tablet Responsive Redesign (Zero Overflow)**:
+   - Root containment: enforced `max-w-[100vw]` and `overflow-x-hidden` across HTML/body to completely prevent horizontal scrolling and layout breakage on mobile screens (320px–480px).
+   - KPI Stats: responsive grid `grid-cols-2 md:grid-cols-4` with adaptive font sizes (`text-xl sm:text-3xl`).
+   - Adaptive video canvas: dynamic aspect ratio (`aspect-[4/3] xs:aspect-video sm:aspect-video`) with touch-friendly stream selector buttons.
+   - Flexible dossier cards: multi-row wrapping for thumbnails, HSRP plates, and confidence progress bars on mobile viewports.
+   - Touch-scrolling audit table: encapsulated table in an isolated `overflow-x-auto min-w-[750px]` container to maintain full column readability on handheld devices.
+
 ---
 
-### Phase 4: Commercial Pitch Deck & Documentation
+### Phase 4: GitHub Deployment & Interactive Cloud Showcase
+
+1. **GitHub Repository**:
+   - Initialized Git with clean `.gitignore` excluding `.venv/`, `anpr.db`, and temporary snapshots.
+   - Pushed main branch to `https://github.com/rishukumark19/aegis-anpr`.
+
+2. **GitHub Pages Live Interactive Showcase (`docs/index.html`)**:
+   - Deployed standalone cloud demonstration build accessible without a local GPU/Python server.
+   - Interactive features: browser webcam feed support (`navigator.mediaDevices.getUserMedia`), periodic simulation engine pushing realistic Indian vehicle dossiers, HSRP plates, and searchable archive.
+   - Live URL: `https://rishukumar.is-a.dev/aegis-anpr/` with `.nojekyll` pipeline bypass.
+
+---
+
+### Phase 5: Commercial Pitch Deck & Documentation
 
 1. **Client Proposal (`CLIENT_PROPOSAL.md`)**:
    - Formal commercial pitch deck for presenting to society RWAs, commercial facility managers, and IT park security heads.
