@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AegisANPR · Live Interactive Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,14 +32,23 @@
   </script>
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
       background-color: #05080f;
       background-image:
         radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16,185,129,0.06) 0%, transparent 60%),
         radial-gradient(ellipse 50% 40% at 100% 80%, rgba(56,189,248,0.04) 0%, transparent 50%);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -66,49 +75,58 @@
     }
     .status-dot { animation: greenpulse 2.4s infinite; }
 
-    /* Realistic HSRP Plate */
+    /* Realistic Indian HSRP Plate */
     .hsrp-plate {
       display: inline-flex;
       align-items: center;
       background: #ffffff;
-      border: 2px solid #111827;
+      border: 1.5px solid #111827;
       border-radius: 5px;
-      padding: 3px 8px 3px 0px;
+      padding: 2px 7px 2px 0px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.5);
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
       color: #111827;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       line-height: 1;
+      white-space: nowrap;
+      user-select: none;
     }
     .hsrp-plate .ind-strip {
       background: #1a3fa0;
       color: #fff;
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 700;
       font-family: 'Inter', sans-serif;
       letter-spacing: 0.05em;
-      padding: 4px 4px;
+      padding: 3px 3px;
       border-radius: 3px 0 0 3px;
-      margin-right: 7px;
+      margin-right: 6px;
       writing-mode: vertical-rl;
       text-orientation: mixed;
       transform: rotate(180deg);
       line-height: 1;
-      min-height: 28px;
+      min-height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .hsrp-plate .plate-chars { font-size: 16px; }
-    .hsrp-plate.large .plate-chars { font-size: 21px; }
-    .hsrp-plate.large .ind-strip { min-height: 36px; font-size: 9px; }
+    .hsrp-plate .plate-chars { font-size: 14px; }
+    .hsrp-plate.large .plate-chars { font-size: 18px; }
+    .hsrp-plate.large .ind-strip { min-height: 30px; font-size: 8px; }
+
+    @media (min-width: 640px) {
+      .hsrp-plate .plate-chars { font-size: 16px; }
+      .hsrp-plate.large .plate-chars { font-size: 21px; }
+      .hsrp-plate.large .ind-strip { min-height: 34px; font-size: 9px; }
+    }
 
     .conf-bar-track {
       height: 4px;
       background: rgba(255,255,255,0.06);
       border-radius: 99px;
       overflow: hidden;
+      width: 100%;
     }
     .conf-bar-fill {
       height: 100%;
@@ -117,10 +135,10 @@
     }
 
     @keyframes slideInDown {
-      from { opacity: 0; transform: translateY(-12px); }
+      from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .dossier-entry { animation: slideInDown 0.35s ease forwards; }
+    .dossier-entry { animation: slideInDown 0.3s ease forwards; }
 
     @keyframes alertglow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
@@ -133,12 +151,12 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
+      gap: 3px;
+      padding: 2px 7px;
       border-radius: 99px;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
     }
     .badge-clear { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
@@ -149,17 +167,20 @@
     .feed-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 12px;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.18s ease;
       border: 1px solid transparent;
-      letter-spacing: 0.02em;
+      white-space: nowrap;
+      flex: 1 1 auto;
+      text-align: center;
     }
-    .feed-btn:hover { transform: translateY(-1px); }
+    .feed-btn:active { transform: scale(0.98); }
 
     .sep { border-color: rgba(255,255,255,0.06); }
 
@@ -176,124 +197,116 @@
       pointer-events: none;
     }
 
-    .corner { position: absolute; width: 16px; height: 16px; }
-    .corner-tl { top: 10px; left: 10px; border-top: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-tr { top: 10px; right: 10px; border-top: 2px solid #10b981; border-right: 2px solid #10b981; }
-    .corner-bl { bottom: 10px; left: 10px; border-bottom: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid #10b981; border-right: 2px solid #10b981; }
+    .corner { position: absolute; width: 14px; height: 14px; }
+    .corner-tl { top: 8px; left: 8px; border-top: 2px solid #10b981; border-left: 2px solid #10b981; }
+    .corner-tr { top: 8px; right: 8px; border-top: 2px solid #10b981; border-right: 2px solid #10b981; }
+    .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #10b981; border-left: 2px solid #10b981; }
+    .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #10b981; border-right: 2px solid #10b981; }
   </style>
 </head>
 
-<body class="text-slate-100 antialiased">
+<body class="text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
 
   <!-- TOP NOTICE BAR -->
-  <div class="px-6 py-2 text-center text-[11px] font-medium bg-gradient-to-r from-emerald-950/80 via-slate-900 to-cyan-950/80 border-b sep flex items-center justify-center gap-2">
-    <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot"></span>
-    <span class="text-slate-300">GitHub Pages Cloud Preview · Interactive Client Showcase Mode</span>
-    <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="text-emerald-400 underline font-semibold hover:text-emerald-300 ml-2">View Source Repo</a>
+  <div class="px-4 py-2 text-center text-[10.5px] sm:text-[11px] font-medium bg-gradient-to-r from-emerald-950/80 via-slate-900 to-cyan-950/80 border-b sep flex items-center justify-center gap-2 flex-wrap">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+    <span class="text-slate-300">Interactive Cloud Demo Mode</span>
+    <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="text-emerald-400 underline font-semibold hover:text-emerald-300 ml-1">GitHub Repo</a>
   </div>
 
   <!-- HEADER -->
   <header class="sticky top-0 z-50 border-b sep" style="background: rgba(5,8,15,0.95); backdrop-filter: blur(24px);">
-    <div class="max-w-[1800px] mx-auto px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3.5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
-          <i data-lucide="shield-check" class="text-emerald-400" style="width:18px;height:18px;"></i>
+    <div class="w-full max-w-[1800px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
+          <i data-lucide="shield-check" class="text-emerald-400" style="width:17px;height:17px;"></i>
         </div>
-        <div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-[15px] font-bold tracking-tight text-white">Aegis<span class="text-emerald-400">ANPR</span></span>
-            <span class="text-[9px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);">Cloud Demo</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="text-sm sm:text-[15px] font-bold tracking-tight text-white whitespace-nowrap">Aegis<span class="text-emerald-400">ANPR</span></span>
+            <span class="text-[8.5px] sm:text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);">Demo</span>
           </div>
-          <p class="text-[11px] text-slate-500 mt-0.5 leading-none">High-Security Indian Number Plate Surveillance & Vahan Dossier</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 truncate hidden xs:block leading-none mt-0.5">Surveillance AI &amp; Vahan Dossier</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-          <span class="text-[11px] text-slate-400">Status:</span>
-          <span class="text-[11px] font-semibold text-slate-200">Active Live Feed</span>
-        </div>
-
-        <button onclick="triggerSimulatedDetection()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-950 transition" style="background:linear-gradient(135deg,#10b981,#059669);">
-          <i data-lucide="sparkles" style="width:13px;height:13px;"></i>
-          Simulate Scan
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        <button onclick="triggerSimulatedDetection()" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-bold text-slate-950 transition" style="background:linear-gradient(135deg,#10b981,#059669);">
+          <i data-lucide="sparkles" style="width:12px;height:12px;"></i>
+          <span>Scan</span>
         </button>
 
-        <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-          <i data-lucide="github" style="width:13px;height:13px;"></i>
-          Star on GitHub
+        <a href="https://github.com/rishukumark19/aegis-anpr" target="_blank" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <i data-lucide="github" style="width:12px;height:12px;"></i>
+          <span class="hidden sm:inline">GitHub</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- MAIN -->
-  <main class="max-w-[1800px] mx-auto px-6 py-6 space-y-6">
+  <main class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
     <!-- KPI STATS -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="glass rounded-2xl p-5 relative overflow-hidden">
-        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Total Scanned</p>
-        <div class="mt-2 font-mono font-bold text-3xl text-white kpi-num" id="stat-total">1,248</div>
-        <p class="text-[11px] text-slate-500 mt-1">All-time detections</p>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Total Scanned</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-total">1,248</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">All-time detections</p>
       </div>
-      <div class="glass rounded-2xl p-5 relative overflow-hidden">
-        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Today's Traffic</p>
-        <div class="mt-2 font-mono font-bold text-3xl text-white kpi-num" id="stat-today">142</div>
-        <p class="text-[11px] text-emerald-500 mt-1 font-medium kpi-num" id="stat-unique">118 unique plates</p>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Today's Traffic</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-today">142</div>
+        <p class="text-[9.5px] sm:text-[11px] text-emerald-400 mt-0.5 sm:mt-1 truncate font-medium kpi-num" id="stat-unique">118 unique</p>
       </div>
-      <div class="glass rounded-2xl p-5 relative overflow-hidden">
-        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">AI Accuracy</p>
-        <div class="mt-2 font-mono font-bold text-3xl text-emerald-400 kpi-num" id="stat-accuracy">94.8%</div>
-        <p class="text-[11px] text-slate-500 mt-1">Indian RTO verified</p>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">AI Accuracy</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-emerald-400 kpi-num" id="stat-accuracy">94.8%</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Indian RTO verified</p>
       </div>
-      <div class="glass rounded-2xl p-5 relative overflow-hidden">
-        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Security Alerts</p>
-        <div class="mt-2 font-mono font-bold text-3xl text-amber-400 kpi-num" id="stat-flagged">4</div>
-        <p class="text-[11px] text-slate-500 mt-1">Gov flag / Blacklisted</p>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Alerts</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-amber-400 kpi-num" id="stat-flagged">4</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Gov flag / Blacklisted</p>
       </div>
     </section>
 
     <!-- LIVE MONITOR & DOSSIER -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-      <!-- LEFT: Video Player (Webcam / Canvas Simulation) -->
-      <div class="lg:col-span-5 glass rounded-2xl overflow-hidden flex flex-col">
-        <div class="px-4 py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
+      <!-- LEFT: Video Box -->
+      <div class="lg:col-span-5 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col">
+        <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot flex-shrink-0"></span>
-            <span class="text-[11px] font-bold tracking-widest uppercase text-white">Live Surveillance Video</span>
+            <span class="text-[10.5px] sm:text-[11px] font-bold tracking-widest uppercase text-white">Live Camera</span>
           </div>
-          <span class="text-[10px] font-mono font-semibold px-2.5 py-1 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLOv8 + PaddleOCR</span>
+          <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLOv8 + OCR</span>
         </div>
 
-        <!-- Input Source Selector -->
-        <div class="px-4 py-3 border-b sep" style="background:rgba(5,8,15,0.4);">
-          <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Mode</p>
-          <div class="flex flex-wrap gap-2">
-            <button class="feed-btn text-white font-semibold" style="background:linear-gradient(135deg, #0891b2 0%, #1d4ed8 100%);border-color:rgba(14,165,233,0.4);" onclick="startWebcam()">
+        <div class="px-3 sm:px-4 py-2.5 border-b sep" style="background:rgba(5,8,15,0.4);">
+          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Mode</p>
+          <div class="flex flex-wrap gap-1.5 sm:gap-2">
+            <button class="feed-btn text-white" style="background:linear-gradient(135deg, #0891b2 0%, #1d4ed8 100%);border-color:rgba(14,165,233,0.4);" onclick="startWebcam()">
               <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              Use My Webcam
+              <span>Use Webcam</span>
             </button>
-            <button class="feed-btn text-purple-300 font-semibold" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);" onclick="playDemoVideo()">
+            <button class="feed-btn text-purple-300" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);" onclick="playDemoVideo()">
               <i data-lucide="film" style="width:13px;height:13px;"></i>
-              Traffic Demo Reel
+              <span>Traffic Reel</span>
             </button>
           </div>
         </div>
 
-        <!-- Video Player Box -->
-        <div class="relative bg-black flex-1 flex items-center justify-center overflow-hidden" style="min-height:300px;">
+        <div class="relative bg-black w-full flex items-center justify-center overflow-hidden aspect-[4/3] xs:aspect-video sm:aspect-video lg:min-h-[290px]">
           <video id="live-video" class="w-full h-full object-contain hidden" autoplay playsinline muted></video>
           
-          <div id="video-placeholder" class="text-center p-6 space-y-3">
-            <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);">
-              <i data-lucide="cctv" style="width:32px;height:32px;color:#34d399;"></i>
+          <div id="video-placeholder" class="text-center p-4 sm:p-6 space-y-2.5">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-xl sm:rounded-2xl flex items-center justify-center" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);">
+              <i data-lucide="cctv" style="width:26px;height:26px;color:#34d399;"></i>
             </div>
-            <p class="text-sm font-bold text-white">Interactive Camera Demo</p>
-            <p class="text-xs text-slate-400 max-w-sm">Click <strong>Use My Webcam</strong> above to test with your phone in front of the camera, or watch the simulated real-time stream.</p>
+            <p class="text-xs sm:text-sm font-bold text-white">Live Camera Preview</p>
+            <p class="text-[10.5px] sm:text-xs text-slate-400 max-w-xs mx-auto">Click <strong>Use Webcam</strong> to test phone recognition, or watch simulated events.</p>
           </div>
 
           <div class="scan-overlay"></div>
@@ -302,75 +315,77 @@
           <div class="corner corner-bl"></div>
           <div class="corner corner-br"></div>
 
-          <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-mono font-semibold text-slate-200" style="background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
-            <span id="player-label">Gate 01 Inbound (Simulated)</span>
+          <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-mono font-semibold text-slate-200 max-w-[85%] truncate" style="background:rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+            <span id="player-label" class="truncate">Gate 01 Inbound</span>
           </div>
         </div>
 
-        <div class="px-4 py-2.5 flex items-start gap-2.5 border-t sep" style="background:rgba(14,165,233,0.05);">
-          <i data-lucide="lightbulb" style="width:14px;height:14px;color:#22d3ee;flex-shrink:0;margin-top:1px;"></i>
-          <p class="text-[11px] text-slate-400 leading-snug"><span class="text-cyan-300 font-semibold">Self-Hosted Deployment:</span> The full backend runs locally on Windows/Linux with zero cloud costs using real RTSP camera feeds.</p>
+        <div class="px-3.5 py-2 flex items-start gap-2 border-t sep" style="background:rgba(14,165,233,0.04);">
+          <i data-lucide="lightbulb" style="width:13px;height:13px;color:#22d3ee;flex-shrink:0;margin-top:2px;"></i>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
+            <span class="text-cyan-300 font-semibold">Self-Hosted:</span> Runs locally on PC/NVR with RTSP CCTV cameras at zero cloud API cost.
+          </p>
         </div>
       </div>
 
       <!-- RIGHT: Instant Dossier Stream -->
-      <div class="lg:col-span-7 glass rounded-2xl overflow-hidden flex flex-col" style="height:580px;">
-        <div class="px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.6);">
-          <div class="flex items-center gap-2.5">
-            <i data-lucide="fingerprint" style="width:16px;height:16px;color:#34d399;"></i>
-            <h2 class="text-[11px] font-bold uppercase tracking-widest text-white">Live Vehicle Identity & Verification Dossier</h2>
+      <div class="lg:col-span-7 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-[520px] sm:h-[580px]">
+        <div class="px-4 sm:px-5 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.6);">
+          <div class="flex items-center gap-2">
+            <i data-lucide="fingerprint" style="width:15px;height:15px;color:#34d399;"></i>
+            <h2 class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Live Identity Dossier</h2>
           </div>
-          <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Live Push Demo</span>
+          <span class="text-[9.5px] sm:text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">WebSocket Push</span>
         </div>
 
-        <div id="dossier-feed" class="flex-1 overflow-y-auto p-4 space-y-3">
-          <!-- Feed items injected dynamically -->
+        <div id="dossier-feed" class="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-2.5 sm:space-y-3">
+          <!-- Dynamic cards -->
         </div>
       </div>
 
     </section>
 
     <!-- SEARCH & AUDIT ARCHIVE -->
-    <section class="glass rounded-2xl overflow-hidden">
-      <div class="px-5 py-4 border-b sep flex flex-col md:flex-row md:items-center justify-between gap-3" style="background:rgba(5,8,15,0.5);">
+    <section class="glass rounded-xl sm:rounded-2xl overflow-hidden">
+      <div class="px-4 sm:px-5 py-3.5 border-b sep flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="background:rgba(5,8,15,0.5);">
         <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i data-lucide="database" style="width:15px;height:15px;color:#60a5fa;"></i>
-            Vehicle Movement Archive & Vahan Registry
+          <h2 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="database" style="width:14px;height:14px;color:#60a5fa;"></i>
+            Vehicle Movement Archive
           </h2>
-          <p class="text-[11px] text-slate-500 mt-0.5">Filter scanned records by license plate or flagged alert status</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Filter scanned records by plate, owner, or status</p>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <input
             type="text"
             id="search-input"
-            placeholder="Search plate, state, owner..."
-            class="text-[12px] rounded-lg font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition"
-            style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:7px 12px 7px 12px;width:220px;"
+            placeholder="Search plate or owner..."
+            class="flex-1 sm:w-48 text-[11.5px] rounded-lg font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition"
+            style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:6px 10px;"
             oninput="filterTable()"
           />
-          <button onclick="triggerSimulatedDetection()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-            <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Sample
+          <button onclick="triggerSimulatedDetection()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+            <i data-lucide="plus" style="width:11px;height:11px;"></i> Add Sample
           </button>
         </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
+      <div class="w-full overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[750px]">
           <thead>
             <tr style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(5,8,15,0.7);">
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Time</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Plate</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Confidence</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Verification</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Security</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Vehicle &amp; Owner</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Registered Address</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Time</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Plate</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Confidence</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Verification</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Security</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Vehicle &amp; Owner</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Registered Address</th>
             </tr>
           </thead>
-          <tbody id="history-table-body" class="text-slate-300 text-xs">
+          <tbody id="history-table-body" class="text-slate-300 text-xs divide-y divide-white/5">
           </tbody>
         </table>
       </div>
@@ -379,16 +394,16 @@
   </main>
 
   <!-- LIGHTBOX MODAL -->
-  <div id="image-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);">
-    <div class="glass rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl">
-      <div class="px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
-        <h3 class="text-sm font-semibold text-white" id="modal-title">Verification Snapshot</h3>
-        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition">
-          <i data-lucide="x" style="width:18px;height:18px;"></i>
+  <div id="image-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);">
+    <div class="glass rounded-xl sm:rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl">
+      <div class="px-4 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
+        <h3 class="text-xs sm:text-sm font-semibold text-white" id="modal-title">Verification Snapshot</h3>
+        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition p-1">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
         </button>
       </div>
-      <div class="p-4 bg-black flex items-center justify-center" style="max-height:75vh;">
-        <img id="modal-image" src="" alt="Snapshot" class="rounded-lg" style="max-height:70vh;object-fit:contain;">
+      <div class="p-3 sm:p-4 bg-black flex items-center justify-center max-h-[75vh]">
+        <img id="modal-image" src="" alt="Snapshot" class="rounded-lg object-contain max-h-[70vh] w-full">
       </div>
     </div>
   </div>
@@ -396,7 +411,6 @@
   <script>
     lucide.createIcons();
 
-    // Mock Sample Vehicle Fleet for Web Demo
     const sampleVehicles = [
       {
         plate: 'DL2CQ3150',
@@ -477,59 +491,59 @@
       const color = confColor(v.conf);
 
       const card = document.createElement('div');
-      card.className = `dossier-entry rounded-2xl overflow-hidden ${isAlert ? 'alert-card' : ''}`;
+      card.className = `dossier-entry rounded-xl sm:rounded-2xl overflow-hidden ${isAlert ? 'alert-card' : ''}`;
       card.style.cssText = isAlert
         ? 'background:rgba(30,5,5,0.9);border:1px solid rgba(239,68,68,0.45);'
         : 'background:rgba(15,22,40,0.85);border:1px solid rgba(255,255,255,0.07);';
 
       card.innerHTML = `
-        <div class="p-4 flex flex-wrap gap-4 items-start">
-          <div class="flex gap-2 flex-shrink-0">
-            <div class="relative cursor-pointer group" onclick="openModal('${v.plateImg}', 'Plate: ${v.plate}')">
-              <img src="${v.plateImg}" class="h-14 w-24 object-cover rounded-xl transition group-hover:scale-105" style="border:1px solid rgba(255,255,255,0.1);background:#000;">
-              <span class="absolute bottom-1 left-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">PLATE</span>
-            </div>
-            <div class="relative cursor-pointer group" onclick="openModal('${v.carImg}', 'Car: ${v.model}')">
-              <img src="${v.carImg}" class="h-14 w-20 object-cover rounded-xl transition group-hover:scale-105" style="border:1px solid rgba(255,255,255,0.1);background:#000;">
-              <span class="absolute bottom-1 left-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">CAR</span>
-            </div>
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <div class="flex flex-wrap items-center gap-3 mb-2.5">
-              ${hsrpBadge(v.plate, 'large')}
-              ${isAlert ? '<span class="badge badge-alert text-[11px] px-2.5 py-0.5"><i data-lucide="alert-octagon" style="width:12px;height:12px;"></i> GOV BLACKLISTED</span>' : '<span class="badge badge-clear text-[11px] px-2.5 py-0.5"><i data-lucide="shield-check" style="width:12px;height:12px;"></i> CLEAR</span>'}
-            </div>
-
-            <div class="mb-2">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">AI Confidence</span>
-                <span class="font-mono text-sm font-bold" style="color:${color};">${pct}%</span>
+        <div class="p-3 sm:p-4">
+          <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="relative cursor-pointer group" onclick="openModal('${v.plateImg}', 'Plate: ${v.plate}')">
+                <img src="${v.plateImg}" class="h-12 w-20 sm:h-14 sm:w-24 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105" style="border:1px solid rgba(255,255,255,0.1);background:#000;">
+                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">PLATE</span>
               </div>
-              <div class="conf-bar-track">
-                <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
+              <div class="relative cursor-pointer group" onclick="openModal('${v.carImg}', 'Car: ${v.model}')">
+                <img src="${v.carImg}" class="h-12 w-16 sm:h-14 sm:w-20 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105" style="border:1px solid rgba(255,255,255,0.1);background:#000;">
+                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">CAR</span>
               </div>
             </div>
+
+            <div class="flex-1 min-w-0 w-full xs:w-auto">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                ${hsrpBadge(v.plate, 'large')}
+                ${isAlert ? '<span class="badge badge-alert text-[10px]"><i data-lucide="alert-octagon" style="width:11px;height:11px;"></i> BLACKLIST</span>' : '<span class="badge badge-clear text-[10px]"><i data-lucide="shield-check" style="width:11px;height:11px;"></i> CLEAR</span>'}
+              </div>
+
+              <div class="mb-2">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9.5px] uppercase font-bold tracking-wider text-slate-500">AI Confidence</span>
+                  <span class="font-mono text-xs font-bold" style="color:${color};">${pct}%</span>
+                </div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right xs:self-start">
+              <span class="font-mono text-[10px] text-slate-500">${new Date().toLocaleTimeString()}</span>
+            </div>
           </div>
 
-          <div class="text-right">
-            <span class="font-mono text-[11px] text-slate-500">${new Date().toLocaleTimeString()}</span>
-          </div>
-        </div>
-
-        <div class="px-4 pb-4 pt-0">
-          <div class="rounded-xl px-4 py-2.5 grid grid-cols-1 sm:grid-cols-3 gap-3" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);">
+          <div class="mt-3 rounded-lg sm:rounded-xl p-2.5 sm:p-3 grid grid-cols-1 sm:grid-cols-3 gap-2" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.05);">
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-0.5">Vehicle</p>
-              <p class="text-[12px] font-semibold text-slate-200">${v.model}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Vehicle</p>
+              <p class="text-[11.5px] font-semibold text-slate-200 truncate">${v.model}</p>
             </div>
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-0.5">Registered Owner</p>
-              <p class="text-[12px] font-semibold text-emerald-400">${v.owner}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Registered Owner</p>
+              <p class="text-[11.5px] font-semibold text-emerald-400 truncate">${v.owner}</p>
             </div>
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-0.5">Registered Address</p>
-              <p class="text-[11px] text-slate-400 truncate" title="${v.address}">${v.address}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">RTO Address</p>
+              <p class="text-[10.5px] text-slate-400 truncate" title="${v.address}">${v.address}</p>
             </div>
           </div>
         </div>
@@ -543,17 +557,17 @@
     function renderTable(items) {
       const tbody = document.getElementById('history-table-body');
       tbody.innerHTML = items.map(v => `
-        <tr class="transition" style="border-bottom:1px solid rgba(255,255,255,0.04);">
-          <td class="px-4 py-3 font-mono text-[11px] text-slate-500">${new Date().toLocaleTimeString()}</td>
-          <td class="px-4 py-3">${hsrpBadge(v.plate)}</td>
-          <td class="px-4 py-3 font-mono font-bold" style="color:${confColor(v.conf)}">${Math.round(v.conf * 100)}%</td>
-          <td class="px-4 py-3">${v.verified ? '<span class="badge badge-clear">Auto-Verified</span>' : '<span class="badge badge-warn">Needs Review</span>'}</td>
-          <td class="px-4 py-3">${v.flag.includes('BLACKLIST') ? '<span class="badge badge-alert">BLACKLISTED</span>' : '<span class="badge badge-clear">CLEAR</span>'}</td>
-          <td class="px-4 py-3">
-            <div class="font-semibold text-slate-200">${v.model}</div>
-            <div class="text-[11px] text-slate-500">${v.owner}</div>
+        <tr class="transition hover:bg-white/[0.02]" style="border-bottom:1px solid rgba(255,255,255,0.04);">
+          <td class="px-3.5 py-2.5 whitespace-nowrap font-mono text-[10.5px] text-slate-500">${new Date().toLocaleTimeString()}</td>
+          <td class="px-3.5 py-2.5 whitespace-nowrap">${hsrpBadge(v.plate)}</td>
+          <td class="px-3.5 py-2.5 whitespace-nowrap font-mono font-bold text-[11px]" style="color:${confColor(v.conf)}">${Math.round(v.conf * 100)}%</td>
+          <td class="px-3.5 py-2.5 whitespace-nowrap">${v.verified ? '<span class="badge badge-clear">Verified</span>' : '<span class="badge badge-warn">Review</span>'}</td>
+          <td class="px-3.5 py-2.5 whitespace-nowrap">${v.flag.includes('BLACKLIST') ? '<span class="badge badge-alert">BLACKLISTED</span>' : '<span class="badge badge-clear">CLEAR</span>'}</td>
+          <td class="px-3.5 py-2.5">
+            <div class="font-semibold text-slate-200 text-[11.5px]">${v.model}</div>
+            <div class="text-[10.5px] text-slate-500">${v.owner}</div>
           </td>
-          <td class="px-4 py-3 text-[11px] text-slate-500 max-w-[200px] truncate" title="${v.address}">${v.address}</td>
+          <td class="px-3.5 py-2.5 text-[10.5px] text-slate-500 max-w-[180px] truncate" title="${v.address}">${v.address}</td>
         </tr>
       `).join('');
     }
@@ -575,23 +589,22 @@
       filterTable();
     }
 
-    // Webcam integration
     async function startWebcam() {
       const video = document.getElementById('live-video');
       const placeholder = document.getElementById('video-placeholder');
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         video.srcObject = stream;
         video.classList.remove('hidden');
         placeholder.classList.add('hidden');
-        document.getElementById('player-label').innerText = 'User Webcam (Front Sensor Active)';
+        document.getElementById('player-label').innerText = 'Webcam (Active)';
       } catch (err) {
-        alert('Webcam permission was not granted or webcam is unavailable in your browser.');
+        alert('Webcam permission not granted or camera unavailable.');
       }
     }
 
     function playDemoVideo() {
-      alert('In self-hosted mode on a PC, this connects directly to IP CCTV feeds (RTSP) and video files.');
+      alert('On-site deployment connects directly to real CCTV RTSP streams with zero delay.');
     }
 
     function openModal(url, title) {
@@ -603,15 +616,12 @@
       document.getElementById('image-modal').classList.add('hidden');
     }
 
-    // Initialize with sample records
     sampleVehicles.slice(0, 3).forEach(v => appendDossierCard(v));
     renderTable(historyRecords);
 
-    // Auto-stream random detections every 8 seconds for realism
     setInterval(() => {
       triggerSimulatedDetection();
     }, 8500);
   </script>
 </body>
 </html>
-

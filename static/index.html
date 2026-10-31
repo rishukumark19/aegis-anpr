@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AegisANPR · Vehicle Intelligence Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,23 +32,32 @@
   </script>
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    body {
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
       background-color: #05080f;
       background-image:
         radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16,185,129,0.06) 0%, transparent 60%),
         radial-gradient(ellipse 50% 40% at 100% 80%, rgba(56,189,248,0.04) 0%, transparent 50%);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Custom thin scrollbars */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #1a2540; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #2a3a60; }
 
-    /* Glass card */
+    /* Glass card styling */
     .glass {
       background: rgba(12, 17, 32, 0.85);
       border: 1px solid rgba(255,255,255,0.06);
@@ -60,59 +69,64 @@
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* Live dot */
+    /* Animated status indicators */
     @keyframes livepulse {
       0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
       50% { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 0 5px rgba(239,68,68,0); }
     }
     .live-dot { animation: livepulse 1.6s infinite; }
 
-    /* Status dot */
     @keyframes greenpulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
       50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
     }
     .status-dot { animation: greenpulse 2.4s infinite; }
 
-    /* HSRP Plate */
+    /* Realistic Indian HSRP Plate */
     .hsrp-plate {
       display: inline-flex;
       align-items: center;
       background: #ffffff;
-      border: 2px solid #111827;
+      border: 1.5px solid #111827;
       border-radius: 5px;
-      padding: 3px 8px 3px 0px;
+      padding: 2px 7px 2px 0px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.5);
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
       color: #111827;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       line-height: 1;
+      white-space: nowrap;
+      user-select: none;
     }
     .hsrp-plate .ind-strip {
       background: #1a3fa0;
       color: #fff;
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 700;
       font-family: 'Inter', sans-serif;
       letter-spacing: 0.05em;
-      padding: 4px 4px;
+      padding: 3px 3px;
       border-radius: 3px 0 0 3px;
-      margin-right: 7px;
+      margin-right: 6px;
       writing-mode: vertical-rl;
       text-orientation: mixed;
       transform: rotate(180deg);
       line-height: 1;
-      min-height: 28px;
+      min-height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .hsrp-plate .plate-chars {
-      font-size: 17px;
+    .hsrp-plate .plate-chars { font-size: 14px; }
+    .hsrp-plate.large .plate-chars { font-size: 18px; }
+    .hsrp-plate.large .ind-strip { min-height: 30px; font-size: 8px; }
+
+    @media (min-width: 640px) {
+      .hsrp-plate .plate-chars { font-size: 16px; }
+      .hsrp-plate.large .plate-chars { font-size: 22px; }
+      .hsrp-plate.large .ind-strip { min-height: 34px; font-size: 9px; }
     }
-    .hsrp-plate.large .plate-chars { font-size: 22px; }
-    .hsrp-plate.large .ind-strip { min-height: 36px; font-size: 9px; }
 
     /* Confidence bar */
     .conf-bar-track {
@@ -120,6 +134,7 @@
       background: rgba(255,255,255,0.06);
       border-radius: 99px;
       overflow: hidden;
+      width: 100%;
     }
     .conf-bar-fill {
       height: 100%;
@@ -127,36 +142,32 @@
       transition: width 0.6s ease;
     }
 
-    /* Dossier card entry animation */
+    /* Animation for incoming dossier card */
     @keyframes slideInDown {
-      from { opacity: 0; transform: translateY(-12px); }
+      from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .dossier-entry { animation: slideInDown 0.35s ease forwards; }
+    .dossier-entry { animation: slideInDown 0.3s ease forwards; }
 
-    /* Alert glow */
+    /* Red pulse for flagged/blacklisted vehicles */
     @keyframes alertglow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
       50% { box-shadow: 0 0 16px 4px rgba(239,68,68,0.15); }
     }
     .alert-card { animation: alertglow 2s infinite; }
 
-    /* KPI counter */
     .kpi-num { font-variant-numeric: tabular-nums; }
 
-    /* Table row hover */
-    tr.row-hover:hover td { background: rgba(16,185,129,0.04); }
-
-    /* Pill badge */
+    /* Pill Badges */
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
+      gap: 3px;
+      padding: 2px 7px;
       border-radius: 99px;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
     }
     .badge-clear { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
@@ -164,44 +175,44 @@
     .badge-warn  { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
     .badge-info  { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
 
-    /* Feed switch btn */
+    /* Feed switcher buttons */
     .feed-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 12px;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.18s ease;
       border: 1px solid transparent;
-      letter-spacing: 0.02em;
+      white-space: nowrap;
+      flex: 1 1 auto;
+      text-align: center;
     }
-    .feed-btn:hover { transform: translateY(-1px); }
+    .feed-btn:active { transform: scale(0.98); }
     .feed-btn-webcam {
       background: linear-gradient(135deg, #0891b2 0%, #1d4ed8 100%);
       color: white;
       border-color: rgba(14,165,233,0.4);
-      box-shadow: 0 4px 12px rgba(14,165,233,0.2);
+      box-shadow: 0 2px 8px rgba(14,165,233,0.2);
     }
     .feed-btn-cctv {
       background: rgba(245,158,11,0.1);
       color: #fbbf24;
       border-color: rgba(245,158,11,0.3);
     }
-    .feed-btn-cctv:hover { background: rgba(245,158,11,0.18); }
     .feed-btn-video {
       background: rgba(139,92,246,0.1);
       color: #c4b5fd;
       border-color: rgba(139,92,246,0.3);
     }
-    .feed-btn-video:hover { background: rgba(139,92,246,0.18); }
 
-    /* Separator line */
     .sep { border-color: rgba(255,255,255,0.06); }
 
-    /* Scan line effect on video */
+    /* Surveillance scan line effect */
     .scan-overlay {
       position: absolute;
       inset: 0;
@@ -215,276 +226,242 @@
       pointer-events: none;
     }
 
-    /* Corner brackets on video */
-    .corner { position: absolute; width: 16px; height: 16px; }
-    .corner-tl { top: 10px; left: 10px; border-top: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-tr { top: 10px; right: 10px; border-top: 2px solid #10b981; border-right: 2px solid #10b981; }
-    .corner-bl { bottom: 10px; left: 10px; border-bottom: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid #10b981; border-right: 2px solid #10b981; }
+    /* Reticle corner brackets */
+    .corner { position: absolute; width: 14px; height: 14px; }
+    .corner-tl { top: 8px; left: 8px; border-top: 2px solid #10b981; border-left: 2px solid #10b981; }
+    .corner-tr { top: 8px; right: 8px; border-top: 2px solid #10b981; border-right: 2px solid #10b981; }
+    .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #10b981; border-left: 2px solid #10b981; }
+    .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #10b981; border-right: 2px solid #10b981; }
   </style>
 </head>
 
-<body class="text-slate-100 antialiased">
+<body class="text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
 
   <!-- ═══════════════════════════════════════════ HEADER ═══════════════════════════════════════════ -->
   <header class="sticky top-0 z-50 border-b sep" style="background: rgba(5,8,15,0.95); backdrop-filter: blur(24px);">
-    <div class="max-w-[1800px] mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="w-full max-w-[1800px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
 
       <!-- Brand -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
-          <i data-lucide="shield-check" class="w-4.5 h-4.5 text-emerald-400" style="width:18px;height:18px;"></i>
+      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
+          <i data-lucide="shield-check" class="text-emerald-400" style="width:17px;height:17px;"></i>
         </div>
-        <div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-[15px] font-bold tracking-tight text-white">Aegis<span class="text-emerald-400">ANPR</span></span>
-            <span class="text-[9px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);">v2.0 Pro</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="text-sm sm:text-[15px] font-bold tracking-tight text-white whitespace-nowrap">Aegis<span class="text-emerald-400">ANPR</span></span>
+            <span class="text-[8.5px] sm:text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);">v2.0</span>
           </div>
-          <p class="text-[11px] text-slate-500 mt-0.5 leading-none">Intelligent Vehicle Identification &amp; Security Dossier</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 truncate hidden xs:block leading-none mt-0.5">Surveillance AI &amp; Vahan Dossier</p>
         </div>
       </div>
 
-      <!-- Right controls -->
-      <div class="flex items-center gap-3">
-        <!-- Live channel indicator -->
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+      <!-- Action buttons -->
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        <!-- Channel label on larger screens -->
+        <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
           <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-          <span class="text-[11px] text-slate-400">Channel:</span>
-          <span class="text-[11px] font-semibold text-slate-200 max-w-[180px] truncate" id="current-channel-label">Initialising...</span>
+          <span class="text-[10.5px] text-slate-400">Channel:</span>
+          <span class="text-[10.5px] font-semibold text-slate-200 max-w-[140px] truncate" id="current-channel-label">Loading...</span>
         </div>
 
-        <button onclick="openRtspModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-200 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+        <button onclick="openRtspModal()" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-200 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
           <i data-lucide="sliders-horizontal" style="width:13px;height:13px;color:#22d3ee;"></i>
-          Connect Stream
+          <span class="hidden sm:inline">Connect</span> Stream
         </button>
 
-        <a href="/api/export" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-emerald-300 transition" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);" onmouseover="this.style.background='rgba(16,185,129,0.14)'" onmouseout="this.style.background='rgba(16,185,129,0.08)'">
+        <a href="/api/export" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-emerald-300 transition" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);">
           <i data-lucide="download" style="width:13px;height:13px;"></i>
-          Export CSV
+          <span class="hidden sm:inline">CSV</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ═══════════════════════════════════════════ MAIN ═══════════════════════════════════════════ -->
-  <main class="max-w-[1800px] mx-auto px-6 py-6 space-y-6">
+  <!-- ═══════════════════════════════════════════ MAIN CONTENT ═══════════════════════════════════════════ -->
+  <main class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
-    <!-- ── KPI STATS ROW ── -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- ── KPI STATS ── -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
 
-      <!-- Card template: Total Scanned -->
-      <div class="glass rounded-2xl p-5 relative overflow-hidden group">
-        <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style="background:radial-gradient(circle, #3b82f6, transparent 70%);"></div>
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Total Scanned</p>
-            <div class="mt-2 font-mono font-bold text-3xl text-white kpi-num" id="stat-total">—</div>
-            <p class="text-[11px] text-slate-500 mt-1">All-time detections</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);">
-            <i data-lucide="car-front" style="width:18px;height:18px;color:#60a5fa;"></i>
-          </div>
-        </div>
+      <!-- Total Scanned -->
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Total Scanned</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-total">—</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">All-time detections</p>
       </div>
 
       <!-- Today's Traffic -->
-      <div class="glass rounded-2xl p-5 relative overflow-hidden group">
-        <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style="background:radial-gradient(circle, #10b981, transparent 70%);"></div>
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Today's Traffic</p>
-            <div class="mt-2 font-mono font-bold text-3xl text-white kpi-num" id="stat-today">—</div>
-            <p class="text-[11px] text-emerald-500 mt-1 font-medium kpi-num" id="stat-unique">— unique plates</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);">
-            <i data-lucide="activity" style="width:18px;height:18px;color:#34d399;"></i>
-          </div>
-        </div>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Today's Traffic</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-today">—</div>
+        <p class="text-[9.5px] sm:text-[11px] text-emerald-400 mt-0.5 sm:mt-1 truncate font-medium kpi-num" id="stat-unique">— unique</p>
       </div>
 
       <!-- AI Accuracy -->
-      <div class="glass rounded-2xl p-5 relative overflow-hidden group">
-        <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style="background:radial-gradient(circle, #8b5cf6, transparent 70%);"></div>
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">AI Accuracy</p>
-            <div class="mt-2 font-mono font-bold text-3xl text-emerald-400 kpi-num" id="stat-accuracy">—%</div>
-            <p class="text-[11px] text-slate-500 mt-1">Indian RTO verified</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);">
-            <i data-lucide="badge-check" style="width:18px;height:18px;color:#a78bfa;"></i>
-          </div>
-        </div>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">AI Accuracy</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-emerald-400 kpi-num" id="stat-accuracy">—%</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Indian RTO verified</p>
       </div>
 
       <!-- Security Alerts -->
-      <div class="glass rounded-2xl p-5 relative overflow-hidden group">
-        <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style="background:radial-gradient(circle, #f59e0b, transparent 70%);"></div>
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Security Alerts</p>
-            <div class="mt-2 font-mono font-bold text-3xl text-amber-400 kpi-num" id="stat-flagged">—</div>
-            <p class="text-[11px] text-slate-500 mt-1">Gov flag / Unverified</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">
-            <i data-lucide="shield-alert" style="width:18px;height:18px;color:#fbbf24;"></i>
-          </div>
-        </div>
+      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
+        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Alerts</p>
+        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-amber-400 kpi-num" id="stat-flagged">—</div>
+        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Gov flag / Unverified</p>
       </div>
 
     </section>
 
-    <!-- ── LIVE MONITOR + DOSSIER ── -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <!-- ── LIVE MONITOR + LIVE DOSSIER ── -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-      <!-- ── LEFT: Live Camera Feed ── -->
-      <div class="lg:col-span-5 glass rounded-2xl overflow-hidden flex flex-col">
+      <!-- ── LEFT: Live Video Feed (12 cols mobile, 5 cols desktop) ── -->
+      <div class="lg:col-span-5 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col">
 
-        <!-- Player header -->
-        <div class="px-4 py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
+        <!-- Feed status bar -->
+        <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot flex-shrink-0"></span>
-            <span class="text-[11px] font-bold tracking-widest uppercase text-white">Live Surveillance</span>
+            <span class="text-[10.5px] sm:text-[11px] font-bold tracking-widest uppercase text-white">Live Camera</span>
           </div>
-          <span class="text-[10px] font-mono font-semibold px-2.5 py-1 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLO · PaddleOCR</span>
+          <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLO · PaddleOCR</span>
         </div>
 
-        <!-- Stream switchers -->
-        <div class="px-4 py-3 border-b sep" style="background:rgba(5,8,15,0.4);">
-          <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2.5">Input Source</p>
-          <div class="flex flex-wrap gap-2">
+        <!-- 1-Click Stream switch buttons (Responsive flex wrap) -->
+        <div class="px-3 sm:px-4 py-2.5 border-b sep" style="background:rgba(5,8,15,0.4);">
+          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Source</p>
+          <div class="flex flex-wrap gap-1.5 sm:gap-2">
             <button class="feed-btn feed-btn-webcam" onclick="switchStream('0', 'Laptop Webcam')">
               <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              Laptop Webcam
+              <span>Webcam</span>
             </button>
             <button class="feed-btn feed-btn-cctv" onclick="openRtspModal()">
               <i data-lucide="cctv" style="width:13px;height:13px;"></i>
-              CCTV / IP Cam
+              <span>CCTV / IP</span>
             </button>
             <button class="feed-btn feed-btn-video" onclick="switchStream('test_samples/indian_traffic_test.mp4', 'Sample Traffic Video')">
               <i data-lucide="film" style="width:13px;height:13px;"></i>
-              Traffic Demo
+              <span>Demo Reel</span>
             </button>
           </div>
         </div>
 
-        <!-- Video frame -->
-        <div class="relative bg-black flex-1" style="min-height:280px;">
+        <!-- Video stream frame -->
+        <div class="relative bg-black w-full flex items-center justify-center overflow-hidden aspect-[4/3] xs:aspect-video sm:aspect-video lg:min-h-[290px]">
           <img
             id="live-video-player"
             src="/video_feed"
             alt="Live ANPR Feed"
             class="w-full h-full object-contain"
-            style="min-height:280px;"
-            onerror="this.parentElement.innerHTML='<div class=\'absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-600\'><i data-lucide=\'video-off\' style=\'width:36px;height:36px;\'></i><span class=\'text-xs\'>Stream offline</span></div>'; lucide.createIcons();"
+            onerror="this.parentElement.innerHTML='<div class=\'absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-600 p-4 text-center\'><i data-lucide=\'video-off\' style=\'width:32px;height:32px;\'></i><span class=\'text-xs\'>Stream connecting...</span></div>'; lucide.createIcons();"
           />
-          <!-- scan line overlay -->
           <div class="scan-overlay"></div>
-          <!-- corners -->
           <div class="corner corner-tl"></div>
           <div class="corner corner-tr"></div>
           <div class="corner corner-bl"></div>
           <div class="corner corner-br"></div>
-          <!-- feed label -->
-          <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-mono font-semibold text-slate-200" style="background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
-            <span id="player-feed-name">Gate 01 Inbound</span>
+
+          <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-mono font-semibold text-slate-200 max-w-[85%] truncate" style="background:rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
+            <span id="player-feed-name" class="truncate">Gate 01 Inbound</span>
           </div>
         </div>
 
-        <!-- Quick test tip -->
-        <div class="px-4 py-2.5 flex items-start gap-2.5 border-t sep" style="background:rgba(14,165,233,0.05);">
-          <i data-lucide="lightbulb" style="width:14px;height:14px;color:#22d3ee;flex-shrink:0;margin-top:1px;"></i>
-          <p class="text-[11px] text-slate-400 leading-snug"><span class="text-cyan-300 font-semibold">Quick Test:</span> Switch to <em>Laptop Webcam</em>, then hold your phone showing a number plate in front of the camera to see live recognition.</p>
+        <!-- Quick tip -->
+        <div class="px-3.5 py-2 flex items-start gap-2 border-t sep" style="background:rgba(14,165,233,0.04);">
+          <i data-lucide="lightbulb" style="width:13px;height:13px;color:#22d3ee;flex-shrink:0;margin-top:2px;"></i>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
+            <span class="text-cyan-300 font-semibold">Test with Phone:</span> Switch to <em>Webcam</em> and show a number plate on your phone.
+          </p>
         </div>
 
       </div>
 
-      <!-- ── RIGHT: Live Dossier Feed ── -->
-      <div class="lg:col-span-7 glass rounded-2xl overflow-hidden flex flex-col" style="height:580px;">
+      <!-- ── RIGHT: Instant Dossier Stream (12 cols mobile, 7 cols desktop) ── -->
+      <div class="lg:col-span-7 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-[520px] sm:h-[580px]">
 
-        <!-- Header -->
-        <div class="px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.6);">
-          <div class="flex items-center gap-2.5">
-            <i data-lucide="fingerprint" style="width:16px;height:16px;color:#34d399;"></i>
-            <h2 class="text-[11px] font-bold uppercase tracking-widest text-white">Vehicle Identity Dossier</h2>
-          </div>
+        <!-- Feed header -->
+        <div class="px-4 sm:px-5 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.6);">
           <div class="flex items-center gap-2">
+            <i data-lucide="fingerprint" style="width:15px;height:15px;color:#34d399;"></i>
+            <h2 class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Live Identity Dossier</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
-            <span class="text-[10px] font-mono text-slate-500">WebSocket Live Push</span>
+            <span class="text-[9.5px] sm:text-[10px] font-mono text-slate-500">WebSocket Push</span>
           </div>
         </div>
 
-        <!-- Scrollable cards -->
-        <div id="dossier-feed" class="flex-1 overflow-y-auto p-4 space-y-3">
-          <!-- empty state -->
-          <div id="dossier-empty" class="flex flex-col items-center justify-center h-full py-16 gap-3 text-slate-600">
-            <i data-lucide="scan-line" style="width:40px;height:40px;opacity:0.4;"></i>
-            <p class="text-xs font-medium">Waiting for vehicle events...</p>
-            <p class="text-[11px] text-slate-700">Detections will appear here in real time</p>
+        <!-- Scrollable Dossier Feed -->
+        <div id="dossier-feed" class="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-2.5 sm:space-y-3">
+          <div id="dossier-empty" class="flex flex-col items-center justify-center h-full py-12 gap-2.5 text-slate-600 text-center px-4">
+            <i data-lucide="scan-line" style="width:36px;height:36px;opacity:0.4;"></i>
+            <p class="text-xs font-medium text-slate-400">Waiting for vehicle detections...</p>
+            <p class="text-[10.5px] text-slate-600">Snapshots &amp; Vahan owner data appear here in real time</p>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ── AUDIT LOG TABLE ── -->
-    <section class="glass rounded-2xl overflow-hidden">
+    <!-- ── SEARCH & AUDIT LOG TABLE ── -->
+    <section class="glass rounded-xl sm:rounded-2xl overflow-hidden">
 
-      <!-- Table header -->
-      <div class="px-5 py-4 border-b sep flex flex-col md:flex-row md:items-center justify-between gap-3" style="background:rgba(5,8,15,0.5);">
+      <!-- Header & search controls -->
+      <div class="px-4 sm:px-5 py-3.5 border-b sep flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="background:rgba(5,8,15,0.5);">
         <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i data-lucide="database" style="width:15px;height:15px;color:#60a5fa;"></i>
+          <h2 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="database" style="width:14px;height:14px;color:#60a5fa;"></i>
             Vehicle Movement Archive
           </h2>
-          <p class="text-[11px] text-slate-500 mt-0.5">Filter by plate, state code, or security flag</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Filter by plate, state code, or security status</p>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-          <!-- Search -->
-          <div class="relative">
-            <i data-lucide="search" style="width:13px;height:13px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#64748b;"></i>
+        <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <!-- Search input -->
+          <div class="relative flex-1 sm:flex-initial">
+            <i data-lucide="search" style="width:12px;height:12px;position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#64748b;"></i>
             <input
               type="text"
               id="search-input"
-              placeholder="Search plate, state, RTO..."
-              class="text-[12px] rounded-lg font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition"
-              style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:7px 12px 7px 30px;width:220px;focus-ring:none;"
-              onfocus="this.style.borderColor='rgba(16,185,129,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'"
+              placeholder="Search plate or state..."
+              class="w-full sm:w-48 text-[11.5px] rounded-lg font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition"
+              style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:6px 10px 6px 28px;"
             />
           </div>
 
-          <!-- Flagged toggle -->
-          <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer text-[11px] font-semibold text-slate-300 select-none" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <!-- Alert checkbox -->
+          <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer text-[10.5px] font-semibold text-slate-300 select-none flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
             <input type="checkbox" id="flagged-only-checkbox" class="rounded" style="accent-color:#ef4444;">
-            Alerts only
+            <span>Alerts only</span>
           </label>
 
-          <button onclick="loadHistory()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-            <i data-lucide="refresh-cw" style="width:12px;height:12px;"></i> Refresh
+          <button onclick="loadHistory()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+            <i data-lucide="refresh-cw" style="width:11px;height:11px;"></i>
+            <span>Refresh</span>
           </button>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
+      <!-- Scrollable table container -->
+      <div class="w-full overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[750px]">
           <thead>
             <tr style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(5,8,15,0.7);">
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Time</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Visuals</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Plate</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Confidence</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Verification</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Security</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Vehicle &amp; Owner</th>
-              <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Registered Address</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Time</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Visuals</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Plate</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Confidence</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Verification</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Security</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Vehicle &amp; Owner</th>
+              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Registered Address</th>
             </tr>
           </thead>
-          <tbody id="history-table-body" class="text-slate-300">
+          <tbody id="history-table-body" class="text-slate-300 text-xs divide-y divide-white/5">
             <tr>
-              <td colspan="8" class="px-4 py-10 text-center text-[12px] text-slate-600">Loading records...</td>
+              <td colspan="8" class="px-4 py-8 text-center text-xs text-slate-600">Loading records...</td>
             </tr>
           </tbody>
         </table>
@@ -494,86 +471,85 @@
 
   </main>
 
-  <!-- ════════════════════ RTSP MODAL ════════════════════ -->
-  <div id="rtsp-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);">
-    <div class="glass rounded-2xl overflow-hidden w-full max-w-lg shadow-2xl">
+  <!-- ════════════════════ RTSP / CCTV CONNECTION MODAL ════════════════════ -->
+  <div id="rtsp-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);">
+    <div class="glass rounded-xl sm:rounded-2xl overflow-hidden w-full max-w-lg shadow-2xl">
       <!-- header -->
-      <div class="px-5 py-4 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
-        <div class="flex items-center gap-2.5">
-          <i data-lucide="video" style="width:16px;height:16px;color:#22d3ee;"></i>
-          <h3 class="text-sm font-bold text-white">Connect CCTV / IP Camera</h3>
+      <div class="px-4 sm:px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
+        <div class="flex items-center gap-2">
+          <i data-lucide="video" style="width:15px;height:15px;color:#22d3ee;"></i>
+          <h3 class="text-xs sm:text-sm font-bold text-white">Connect CCTV / IP Camera</h3>
         </div>
-        <button onclick="closeRtspModal()" class="text-slate-500 hover:text-white transition">
-          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        <button onclick="closeRtspModal()" class="text-slate-500 hover:text-white transition p-1">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
         </button>
       </div>
+
       <!-- body -->
-      <div class="p-5 space-y-4">
+      <div class="p-4 sm:p-5 space-y-3.5 text-xs">
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Stream URL (RTSP / HTTP / Webcam Index)</label>
+          <label class="block text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Stream URL (RTSP / HTTP / Webcam Index)</label>
           <input
             type="text"
             id="modal-rtsp-input"
             placeholder="rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101"
-            class="w-full text-[12px] font-mono text-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none transition"
+            class="w-full text-xs font-mono text-slate-200 rounded-lg px-3 py-2 focus:outline-none transition"
             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"
-            onfocus="this.style.borderColor='rgba(34,211,238,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
           />
-          <p class="text-[11px] text-slate-600 mt-1.5">Enter <code class="text-slate-400">0</code> for Laptop Webcam, or paste your camera's RTSP URL.</p>
+          <p class="text-[10px] text-slate-500 mt-1">Enter <code class="text-slate-400">0</code> for Webcam, or paste your RTSP stream link.</p>
         </div>
+
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Camera Name / Location</label>
+          <label class="block text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Camera Name / Location</label>
           <input
             type="text"
             id="modal-cam-name"
-            placeholder="e.g. Main Gate — Inbound Lane"
-            class="w-full text-[12px] text-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none transition"
+            placeholder="e.g. Main Gate Inbound Lane"
+            class="w-full text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none transition"
             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"
-            onfocus="this.style.borderColor='rgba(34,211,238,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
           />
         </div>
 
         <!-- RTSP Templates -->
         <div>
-          <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2.5">Quick-Fill Templates</p>
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="setRtspTemplate('cp_plus')" class="py-2 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.09)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">CP Plus</button>
-            <button onclick="setRtspTemplate('hikvision')" class="py-2 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.09)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Hikvision</button>
-            <button onclick="setRtspTemplate('dahua')" class="py-2 rounded-lg text-[11px] font-semibold text-slate-300 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.09)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Dahua</button>
+          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Quick-Fill Templates</p>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="setRtspTemplate('cp_plus')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">CP Plus</button>
+            <button onclick="setRtspTemplate('hikvision')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Hikvision</button>
+            <button onclick="setRtspTemplate('dahua')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Dahua</button>
           </div>
         </div>
 
-        <div class="pt-1 flex justify-end gap-2 border-t sep">
-          <button onclick="closeRtspModal()" class="px-4 py-2 rounded-xl text-[12px] font-semibold text-slate-400 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Cancel</button>
-          <button onclick="submitCameraSwitch()" class="px-5 py-2 rounded-xl text-[12px] font-bold text-slate-950 flex items-center gap-1.5 transition" style="background:linear-gradient(135deg,#10b981,#059669);" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-            <i data-lucide="check" style="width:14px;height:14px;"></i> Switch Now
+        <div class="pt-2 flex justify-end gap-2 border-t sep">
+          <button onclick="closeRtspModal()" class="px-3.5 py-1.5 rounded-lg text-[11px] font-semibold text-slate-400 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Cancel</button>
+          <button onclick="submitCameraSwitch()" class="px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-950 flex items-center gap-1 transition" style="background:linear-gradient(135deg,#10b981,#059669);">
+            <i data-lucide="check" style="width:13px;height:13px;"></i> Switch Now
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ════════════════════ IMAGE LIGHTBOX ════════════════════ -->
-  <div id="image-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);">
-    <div class="glass rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl">
-      <div class="px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
-        <h3 class="text-sm font-semibold text-white" id="modal-title">Verification Snapshot</h3>
-        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition">
-          <i data-lucide="x" style="width:18px;height:18px;"></i>
+  <!-- ════════════════════ IMAGE LIGHTBOX MODAL ════════════════════ -->
+  <div id="image-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);">
+    <div class="glass rounded-xl sm:rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl">
+      <div class="px-4 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
+        <h3 class="text-xs sm:text-sm font-semibold text-white" id="modal-title">Verification Snapshot</h3>
+        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition p-1">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
         </button>
       </div>
-      <div class="p-4 bg-black flex items-center justify-center" style="max-height:75vh;">
-        <img id="modal-image" src="" alt="Snapshot" class="rounded-lg" style="max-height:70vh;object-fit:contain;">
+      <div class="p-3 sm:p-4 bg-black flex items-center justify-center max-h-[75vh]">
+        <img id="modal-image" src="" alt="Snapshot" class="rounded-lg object-contain max-h-[70vh] w-full">
       </div>
     </div>
   </div>
 
-  <!-- ════════════════════════ SCRIPTS ════════════════════════ -->
+  <!-- ════════════════════════ APPLICATION SCRIPTS ════════════════════════ -->
   <script>
     lucide.createIcons();
 
-    // ─── Helpers ───────────────────────────────────────────────
-
+    // ─── Formatting Helpers ─────────────────────────────────────
     function confColor(c) {
       if (c >= 0.88) return '#10b981';
       if (c >= 0.70) return '#f59e0b';
@@ -584,9 +560,9 @@
       const pct = Math.round(confidence * 100);
       const color = confColor(confidence);
       return `
-        <div style="min-width:90px;">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-[11px] font-mono font-bold" style="color:${color};">${pct}%</span>
+        <div style="min-width:80px;max-width:110px;">
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[10.5px] font-mono font-bold" style="color:${color};">${pct}%</span>
           </div>
           <div class="conf-bar-track">
             <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
@@ -604,22 +580,22 @@
     function securityBadge(flag) {
       if (!flag) return '<span class="badge badge-info">—</span>';
       const isAlert = flag.includes('BLACKLIST') || flag.includes('FLAG') || flag.includes('ALERT');
-      if (isAlert) return `<span class="badge badge-alert"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z"/><path d="M12 17h.01"/></svg>${flag}</span>`;
-      return `<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>CLEAR</span>`;
+      if (isAlert) return `<span class="badge badge-alert"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z"/><path d="M12 17h.01"/></svg>${flag}</span>`;
+      return `<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>CLEAR</span>`;
     }
 
     function verifyBadge(needs) {
-      if (needs) return '<span class="badge badge-warn"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Needs Review</span>';
-      return '<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Auto-Verified</span>';
+      if (needs) return '<span class="badge badge-warn"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Review</span>';
+      return '<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>';
     }
 
-    // ─── Stats ──────────────────────────────────────────────────
+    // ─── Stats Loader ───────────────────────────────────────────
     async function loadStats() {
       try {
         const data = await fetch('/api/stats').then(r => r.json());
         document.getElementById('stat-total').innerText    = data.total_vehicles_all_time;
         document.getElementById('stat-today').innerText    = data.vehicles_today;
-        document.getElementById('stat-unique').innerText   = `${data.unique_vehicles_today} unique plates`;
+        document.getElementById('stat-unique').innerText   = `${data.unique_vehicles_today} unique`;
         document.getElementById('stat-accuracy').innerText = `${data.recognition_accuracy}%`;
         document.getElementById('stat-flagged').innerText  = data.flagged_vehicles;
         document.getElementById('current-channel-label').innerText = data.camera_name;
@@ -627,7 +603,7 @@
       } catch (e) { /* silent */ }
     }
 
-    // ─── History Table ──────────────────────────────────────────
+    // ─── History Table Loader ───────────────────────────────────
     async function loadHistory() {
       const search = document.getElementById('search-input').value;
       const flaggedOnly = document.getElementById('flagged-only-checkbox').checked;
@@ -640,43 +616,43 @@
         const tbody = document.getElementById('history-table-body');
 
         if (!data.items || data.items.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-10 text-center text-[12px] text-slate-600">No matching records found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-xs text-slate-600">No matching records found.</td></tr>';
           return;
         }
 
-        const isAlert = f => f && (f.includes('BLACKLIST') || f.includes('FLAG') || f.includes('ALERT'));
-
         tbody.innerHTML = data.items.map(item => `
-          <tr class="row-hover transition" style="border-bottom:1px solid rgba(255,255,255,0.04);">
-            <td class="px-4 py-3">
-              <span class="font-mono text-[11px] text-slate-500">${item.timestamp}</span>
+          <tr class="transition hover:bg-white/[0.02]" style="border-bottom:1px solid rgba(255,255,255,0.04);">
+            <td class="px-3.5 py-2.5 whitespace-nowrap">
+              <span class="font-mono text-[10.5px] text-slate-500">${item.timestamp}</span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-3.5 py-2.5 whitespace-nowrap">
               <div class="flex items-center gap-1.5">
-                <img src="${item.plate_crop_url}" class="h-9 w-20 object-cover rounded-lg cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.plate_crop_url}','Plate: ${item.plate_number}')" title="View plate">
-                <img src="${item.context_crop_url}" class="h-9 w-16 object-cover rounded-lg cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.context_crop_url}','Vehicle: ${item.plate_number}')" title="View vehicle">
+                <img src="${item.plate_crop_url}" class="h-8 w-16 sm:w-20 object-cover rounded cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.plate_crop_url}','Plate: ${item.plate_number}')" title="View plate">
+                <img src="${item.context_crop_url}" class="h-8 w-12 sm:w-16 object-cover rounded cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.context_crop_url}','Vehicle: ${item.plate_number}')" title="View vehicle">
               </div>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-3.5 py-2.5 whitespace-nowrap">
               ${hsrpBadge(item.plate_number)}
             </td>
-            <td class="px-4 py-3">
+            <td class="px-3.5 py-2.5 whitespace-nowrap">
               ${confBarHtml(item.ocr_confidence)}
             </td>
-            <td class="px-4 py-3">${verifyBadge(item.needs_verification)}</td>
-            <td class="px-4 py-3">${securityBadge(item.security_flag)}</td>
-            <td class="px-4 py-3">
-              <div class="text-[12px] font-semibold text-slate-200">${item.vehicle_model}</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">${item.owner_name}</div>
+            <td class="px-3.5 py-2.5 whitespace-nowrap">${verifyBadge(item.needs_verification)}</td>
+            <td class="px-3.5 py-2.5 whitespace-nowrap">${securityBadge(item.security_flag)}</td>
+            <td class="px-3.5 py-2.5">
+              <div class="text-[11.5px] font-semibold text-slate-200">${item.vehicle_model}</div>
+              <div class="text-[10.5px] text-slate-500">${item.owner_name}</div>
             </td>
-            <td class="px-4 py-3 text-[11px] text-slate-500 max-w-[160px]" title="${item.registered_address}" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.registered_address}</td>
+            <td class="px-3.5 py-2.5 text-[10.5px] text-slate-500 max-w-[160px] truncate" title="${item.registered_address}">
+              ${item.registered_address}
+            </td>
           </tr>
         `).join('');
         lucide.createIcons();
       } catch (e) { /* silent */ }
     }
 
-    // ─── Dossier Card ───────────────────────────────────────────
+    // ─── Real-Time Dossier Push ─────────────────────────────────
     function prependDossierCard(d) {
       const feed = document.getElementById('dossier-feed');
       const empty = document.getElementById('dossier-empty');
@@ -686,81 +662,82 @@
       const conf = d.ocr_confidence;
       const pct = Math.round(conf * 100);
       const color = confColor(conf);
-      const timeStr = d.timestamp ? d.timestamp.split(' ')[1] : '';
+      const timeStr = d.timestamp ? (d.timestamp.split(' ')[1] || d.timestamp) : '';
 
       const card = document.createElement('div');
-      card.className = `dossier-entry rounded-2xl overflow-hidden ${isAlert ? 'alert-card' : ''}`;
+      card.className = `dossier-entry rounded-xl sm:rounded-2xl overflow-hidden ${isAlert ? 'alert-card' : ''}`;
       card.style.cssText = isAlert
         ? 'background:rgba(30,5,5,0.9);border:1px solid rgba(239,68,68,0.45);'
         : 'background:rgba(15,22,40,0.85);border:1px solid rgba(255,255,255,0.07);';
 
       card.innerHTML = `
-        <!-- Top: Images + Plate + Confidence -->
-        <div class="p-4 flex flex-wrap gap-4 items-start">
-
-          <!-- Image pair -->
-          <div class="flex gap-2 flex-shrink-0">
-            <div class="relative cursor-pointer group" onclick="openModal('${d.plate_crop_url}','Plate: ${d.plate_number}')">
-              <img src="${d.plate_crop_url}"
-                class="h-14 w-28 object-cover rounded-xl transition group-hover:scale-105"
-                style="border:1px solid rgba(255,255,255,0.1);background:#000;"
-                onerror="this.src='https://placehold.co/120x56/090d18/334155?text=Plate'">
-              <span class="absolute bottom-1 left-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">PLATE</span>
-            </div>
-            <div class="relative cursor-pointer group" onclick="openModal('${d.context_crop_url}','Vehicle: ${d.vehicle_model}')">
-              <img src="${d.context_crop_url}"
-                class="h-14 w-20 object-cover rounded-xl transition group-hover:scale-105"
-                style="border:1px solid rgba(255,255,255,0.1);background:#000;"
-                onerror="this.src='https://placehold.co/80x56/090d18/334155?text=Car'">
-              <span class="absolute bottom-1 left-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">CAR</span>
-            </div>
-          </div>
-
-          <!-- Plate badge + confidence -->
-          <div class="flex-1 min-w-0">
-            <div class="flex flex-wrap items-center gap-3 mb-3">
-              ${hsrpBadge(d.plate_number, 'large')}
-              ${isAlert ? '<span class="badge badge-alert text-xs px-3 py-1" style="font-size:11px;"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\'><path d=\'M12 9v4\'/><path d=\'M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z\'/><path d=\'M12 17h.01\'/></svg>FLAGGED</span>' : ''}
-            </div>
-
-            <!-- Confidence bar -->
-            <div class="mb-2.5">
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">AI Confidence</span>
-                <span class="font-mono text-sm font-bold" style="color:${color};">${pct}%</span>
+        <div class="p-3 sm:p-4">
+          <!-- Top row: Visuals + Plate & Confidence + Time -->
+          <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3">
+            
+            <!-- Visual Thumbnails -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="relative cursor-pointer group" onclick="openModal('${d.plate_crop_url}','Plate: ${d.plate_number}')">
+                <img src="${d.plate_crop_url}"
+                  class="h-12 w-20 sm:h-14 sm:w-24 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105"
+                  style="border:1px solid rgba(255,255,255,0.1);background:#000;"
+                  onerror="this.src='https://placehold.co/100x50/090d18/334155?text=Plate'">
+                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">PLATE</span>
               </div>
-              <div class="conf-bar-track">
-                <div class="conf-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${color},${color}aa);"></div>
+              <div class="relative cursor-pointer group" onclick="openModal('${d.context_crop_url}','Vehicle: ${d.vehicle_model}')">
+                <img src="${d.context_crop_url}"
+                  class="h-12 w-16 sm:h-14 sm:w-20 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105"
+                  style="border:1px solid rgba(255,255,255,0.1);background:#000;"
+                  onerror="this.src='https://placehold.co/80x50/090d18/334155?text=Car'">
+                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">CAR</span>
               </div>
             </div>
 
-            <!-- Status badges row -->
-            <div class="flex items-center flex-wrap gap-1.5">
-              ${verifyBadge(d.needs_verification)}
-              ${securityBadge(d.security_flag)}
+            <!-- Plate Badge + Status Badges -->
+            <div class="flex-1 min-w-0 w-full xs:w-auto">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                ${hsrpBadge(d.plate_number, 'large')}
+                ${isAlert ? '<span class="badge badge-alert text-[10px]"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\'><path d=\'M12 9v4\'/><path d=\'M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z\'/><path d=\'M12 17h.01\'/></svg>FLAGGED</span>' : ''}
+              </div>
+
+              <!-- Confidence Progress Bar -->
+              <div class="mb-2">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9.5px] uppercase font-bold tracking-wider text-slate-500">AI Confidence</span>
+                  <span class="font-mono text-xs font-bold" style="color:${color};">${pct}%</span>
+                </div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
+                </div>
+              </div>
+
+              <!-- Badges Row -->
+              <div class="flex items-center flex-wrap gap-1.5">
+                ${verifyBadge(d.needs_verification)}
+                ${securityBadge(d.security_flag)}
+              </div>
             </div>
+
+            <!-- Time -->
+            <div class="text-right xs:self-start">
+              <span class="font-mono text-[10px] text-slate-500">${timeStr}</span>
+            </div>
+
           </div>
 
-          <!-- Timestamp -->
-          <div class="flex-shrink-0 text-right">
-            <span class="font-mono text-[11px] text-slate-600">${timeStr}</span>
-          </div>
-        </div>
-
-        <!-- Bottom: Owner dossier -->
-        <div class="px-4 pb-4 pt-0">
-          <div class="rounded-xl px-4 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);">
+          <!-- Bottom: Vahan Owner & Vehicle Grid -->
+          <div class="mt-3 rounded-lg sm:rounded-xl p-2.5 sm:p-3 grid grid-cols-1 sm:grid-cols-3 gap-2" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.05);">
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-1">Vehicle</p>
-              <p class="text-[12px] font-semibold text-slate-200">${d.vehicle_model || '—'}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Vehicle</p>
+              <p class="text-[11.5px] font-semibold text-slate-200 truncate">${d.vehicle_model || '—'}</p>
             </div>
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-1">Registered Owner</p>
-              <p class="text-[12px] font-semibold text-emerald-400">${d.owner_name || '—'}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Registered Owner</p>
+              <p class="text-[11.5px] font-semibold text-emerald-400 truncate">${d.owner_name || '—'}</p>
             </div>
             <div>
-              <p class="text-[9px] uppercase font-bold tracking-widest text-slate-600 mb-1">Address</p>
-              <p class="text-[11px] text-slate-400 leading-snug" title="${d.registered_address}" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${d.registered_address || '—'}</p>
+              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">RTO Address</p>
+              <p class="text-[10.5px] text-slate-400 truncate" title="${d.registered_address}">${d.registered_address || '—'}</p>
             </div>
           </div>
         </div>
@@ -788,25 +765,25 @@
       } catch (e) { alert('Failed to switch camera: ' + e); }
     }
 
-    // ─── RTSP Modal ─────────────────────────────────────────────
+    // ─── RTSP Modal Handlers ────────────────────────────────────
     function openRtspModal()  { document.getElementById('rtsp-modal').classList.remove('hidden'); }
     function closeRtspModal() { document.getElementById('rtsp-modal').classList.add('hidden'); }
     function setRtspTemplate(type) {
       const i = document.getElementById('modal-rtsp-input');
       const n = document.getElementById('modal-cam-name');
-      if (type === 'cp_plus')   { i.value = "rtsp://admin:admin123@192.168.1.250:554/cam/realmonitor?channel=1&subtype=0"; n.value = "CP Plus Main Gate [Inbound]"; }
+      if (type === 'cp_plus')   { i.value = "rtsp://admin:admin123@192.168.1.250:554/cam/realmonitor?channel=1&subtype=0"; n.value = "CP Plus Main Gate"; }
       if (type === 'hikvision') { i.value = "rtsp://admin:admin123@192.168.1.64:554/Streaming/Channels/101"; n.value = "Hikvision 4MP Lane 1"; }
       if (type === 'dahua')     { i.value = "rtsp://admin:admin123@192.168.1.108:554/cam/realmonitor?channel=1&subtype=0"; n.value = "Dahua Gate Camera"; }
     }
     function submitCameraSwitch() {
       const source = document.getElementById('modal-rtsp-input').value.trim();
-      const name   = document.getElementById('modal-cam-name').value.trim() || 'CCTV Inbound Channel';
+      const name   = document.getElementById('modal-cam-name').value.trim() || 'CCTV Channel';
       if (!source) { alert('Enter a stream URL or 0 for Webcam.'); return; }
       switchStream(source, name);
       closeRtspModal();
     }
 
-    // ─── Lightbox ───────────────────────────────────────────────
+    // ─── Lightbox Modal ─────────────────────────────────────────
     function openModal(url, title) {
       document.getElementById('modal-image').src = url;
       document.getElementById('modal-title').innerText = title;
@@ -814,7 +791,7 @@
     }
     function closeModal() { document.getElementById('image-modal').classList.add('hidden'); }
 
-    // ─── WebSocket ──────────────────────────────────────────────
+    // ─── WebSocket Connection ───────────────────────────────────
     function connectWebSocket() {
       const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(`${proto}//${location.host}/ws/live`);
@@ -822,7 +799,7 @@
       ws.onclose   = () => setTimeout(connectWebSocket, 3000);
     }
 
-    // ─── Init ───────────────────────────────────────────────────
+    // ─── Initialise ─────────────────────────────────────────────
     document.getElementById('search-input').addEventListener('input', loadHistory);
     document.getElementById('flagged-only-checkbox').addEventListener('change', loadHistory);
 
