@@ -10,7 +10,7 @@ import csv
 from datetime import datetime, date
 from typing import List, Optional
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query, Response
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query, Response, UploadFile, File
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -122,6 +122,27 @@ def switch_camera_feed(payload: CameraSwitchPayload):
         "status": "success",
         "new_source": payload.source,
         "camera_name": camera_worker.camera_name
+    }
+
+@app.post("/api/upload_video")
+async def upload_video_file(file: UploadFile = File(...)):
+    """Uploads an MP4/AVI/MKV video file and switches camera worker to process it."""
+    os.makedirs("test_samples", exist_ok=True)
+    clean_filename = file.filename.replace(" ", "_")
+    target_path = os.path.join("test_samples", f"uploaded_{clean_filename}")
+    
+    with open(target_path, "wb") as buffer:
+        while chunk := await file.read(1024 * 1024):
+            buffer.write(chunk)
+            
+    feed_label = f"Uploaded File: {file.filename}"
+    camera_worker.switch_source(target_path, feed_label)
+    
+    return {
+        "status": "success",
+        "filename": file.filename,
+        "saved_path": target_path,
+        "camera_name": feed_label
     }
 
 @app.get("/api/camera/current")

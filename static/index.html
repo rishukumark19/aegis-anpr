@@ -336,20 +336,29 @@
 
         <!-- 1-Click Stream switch buttons (Responsive flex wrap) -->
         <div class="px-3 sm:px-4 py-2.5 border-b sep" style="background:rgba(5,8,15,0.4);">
-          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Source</p>
+          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Source &amp; Video Test Footage</p>
           <div class="flex flex-wrap gap-1.5 sm:gap-2">
             <button class="feed-btn feed-btn-webcam" onclick="switchStream('0', 'Laptop Webcam')">
               <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              <span>Webcam (0)</span>
+              <span>Webcam</span>
             </button>
             <button class="feed-btn feed-btn-cctv" onclick="openRtspModal()">
               <i data-lucide="cctv" style="width:13px;height:13px;"></i>
-              <span>CCTV / IP</span>
+              <span>CCTV RTSP</span>
             </button>
-            <button class="feed-btn feed-btn-video" onclick="switchStream('test_samples/indian_traffic_test.mp4', 'Sample Traffic Video')">
+            <button class="feed-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3);" onclick="switchStream('test_samples/cars_extended.mp4', 'Intel Toll Booth Footage')">
+              <i data-lucide="check-circle" style="width:13px;height:13px;"></i>
+              <span>Toll Booth (Intel)</span>
+            </button>
+            <button class="feed-btn feed-btn-video" onclick="switchStream('test_samples/indian_traffic_test.mp4', 'Indian Highway Traffic')">
               <i data-lucide="film" style="width:13px;height:13px;"></i>
-              <span>Demo Reel</span>
+              <span>Indian Traffic</span>
             </button>
+            <label class="feed-btn cursor-pointer" style="background:rgba(255,255,255,0.05);color:#94a3b8;border-color:rgba(255,255,255,0.1);">
+              <i data-lucide="upload" style="width:13px;height:13px;color:#38bdf8;"></i>
+              <span>Upload MP4</span>
+              <input type="file" id="video-file-input" accept="video/mp4,video/avi,video/mkv" class="hidden" onchange="uploadVideoFile(this)">
+            </label>
           </div>
         </div>
 
@@ -763,7 +772,7 @@
       loadHistory();
     }
 
-    // ─── Camera Switch ──────────────────────────────────────────
+    // ─── Camera Switch & Video Upload ──────────────────────────
     async function switchStream(source, name) {
       try {
         const data = await fetch('/api/camera/switch', {
@@ -776,6 +785,37 @@
         const img = document.getElementById('live-video-player');
         img.src = '/video_feed?t=' + Date.now();
       } catch (e) { alert('Failed to switch camera: ' + e); }
+    }
+
+    async function uploadVideoFile(input) {
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const channelLabel = document.getElementById('current-channel-label');
+      const originalText = channelLabel.innerText;
+      channelLabel.innerText = `Uploading ${file.name}...`;
+
+      try {
+        const res = await fetch('/api/upload_video', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          channelLabel.innerText = data.camera_name;
+          document.getElementById('player-feed-name').innerText = data.camera_name;
+          const img = document.getElementById('live-video-player');
+          img.src = '/video_feed?t=' + Date.now();
+        } else {
+          alert('Upload error');
+          channelLabel.innerText = originalText;
+        }
+      } catch (err) {
+        alert('Upload failed: ' + err);
+        channelLabel.innerText = originalText;
+      }
     }
 
     // ─── RTSP Modal Handlers ────────────────────────────────────
