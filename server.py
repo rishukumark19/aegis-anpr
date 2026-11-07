@@ -44,9 +44,9 @@ def broadcast_detection(detection_dict: dict):
 
 # Initialize Camera Worker
 camera_worker = CameraWorker(
-    source="test_samples/indian_traffic_test.mp4",
+    source="test_samples/kaggle_anpr_video.mp4",
     model_path="models/indian_plate_yolo.pt",
-    camera_name="Main Gate 01",
+    camera_name="Kaggle ANPR Video Sample",
     on_detection_callback=broadcast_detection,
     conf_threshold=0.25,
     loop_video=True
@@ -86,7 +86,15 @@ def video_feed():
                 yield (b"--frame\r\n"
                        b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
             time.sleep(0.04)
-    return StreamingResponse(frame_generator(), media_type="multipart/x-mixed-replace; boundary=frame")
+    return StreamingResponse(
+        frame_generator(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
+    )
 
 
 # =====================================================================
@@ -126,7 +134,8 @@ def switch_camera_feed(payload: CameraSwitchPayload):
 
 @app.post("/api/upload_video")
 async def upload_video_file(file: UploadFile = File(...)):
-    """Uploads an MP4/AVI/MKV video file and switches camera worker to process it."""
+    """Uploads an MP4/AVI/MKV/ZIP video file and switches camera worker to process it."""
+    import zipfile
     os.makedirs("test_samples", exist_ok=True)
     clean_filename = file.filename.replace(" ", "_")
     target_path = os.path.join("test_samples", f"uploaded_{clean_filename}")
@@ -135,13 +144,25 @@ async def upload_video_file(file: UploadFile = File(...)):
         while chunk := await file.read(1024 * 1024):
             buffer.write(chunk)
             
-    feed_label = f"Uploaded File: {file.filename}"
-    camera_worker.switch_source(target_path, feed_label)
+    video_path = target_path
+    if clean_filename.lower().endswith(".zip"):
+        try:
+            with zipfile.ZipFile(target_path, "r") as z:
+                valid_videos = [f for f in z.namelist() if f.lower().endswith((".mp4", ".avi", ".mkv", ".mov"))]
+                if valid_videos:
+                    extracted_name = valid_videos[0]
+                    z.extract(extracted_name, "test_samples")
+                    video_path = os.path.join("test_samples", extracted_name)
+        except Exception as e:
+            print(f"Error extracting zip: {e}")
+
+    feed_label = f"Uploaded: {os.path.basename(video_path)}"
+    camera_worker.switch_source(video_path, feed_label)
     
     return {
         "status": "success",
         "filename": file.filename,
-        "saved_path": target_path,
+        "saved_path": video_path,
         "camera_name": feed_label
     }
 

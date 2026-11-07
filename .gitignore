@@ -25,6 +25,9 @@ outputs/*
 
 # Large temporary files
 test_samples/tracker_output.gif
+test_samples/uploaded_*
+static/index_backup.html
+*.zip
 
 # IDE / OS specific files
 .vscode/

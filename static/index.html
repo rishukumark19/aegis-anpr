@@ -1,30 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AegisANPR · Vehicle Intelligence Platform</title>
+  <title>AegisANPR · Autonomous Vehicle Intelligence System</title>
+
+  <!-- Typography Hierarchy: Inter (refined neutral UI), JetBrains Mono (high-precision data) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,400..600&family=JetBrains+Mono:ital,wght@0,400..700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Core Scripts: Tailwind, Lucide, Three.js, GSAP for micro-physics -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- HUMAN-CRAFTED DESIGN SYSTEM (Warm Obsidian & Industrial Zinc Palette)   -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-            display: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           },
           colors: {
-            void: '#05080f',
-            ink: '#090d18',
-            glass: '#0c1120',
-            panel: '#0f1628',
-            rim: '#1a2540',
-            accent: '#10b981',
+            // Warm Obsidian & Slate Canvas Hierarchy (Zero neon AI cliches)
+            base: '#0c0d0f',       // Deepest canvas void
+            surface: '#121418',    // Standard card surface
+            elevated: '#181a20',   // Elevated menus, inputs, active states
+            subtle: '#20232b',     // Hover states and pill tracks
+            border: '#22252e',     // Clean structural hairlines
+            borderMuted: 'rgba(255, 255, 255, 0.06)',
+            
+            // Human Typographic Hierarchy
+            ink: {
+              primary: '#f4f4f6',   // High-contrast headings and plate numbers
+              secondary: '#a1a1aa', // Clean labels and descriptions
+              muted: '#71717a',     // Subtle telemetry and table headers
+              faint: '#52525b',     // Micro-timestamps and hints
+            },
+
+            // Semantic Status Accents (Restrained, Real-World Enterprise)
+            status: {
+              active: '#3b82f6',    // Linear-style clean sapphire for active streams
+              success: '#10b981',   // Natural leaf emerald for verified plates
+              warning: '#f59e0b',   // Industrial amber for manual review
+              danger: '#ef4444',    // Solid vermilion red for hotlist/blacklist
+            }
+          },
+          boxShadow: {
+            'elevated': '0 4px 16px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+            'card': '0 2px 10px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
+            'inset-btn': 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.3)',
           }
         }
       }
@@ -32,80 +64,121 @@
   </script>
 
   <style>
+    /* ─── CRAFTED STYLESHEET ────────────────────────────────────────────── */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    html, body {
-      max-width: 100vw;
-      overflow-x: hidden;
-      background-color: #05080f;
-      background-image:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16,185,129,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 100% 80%, rgba(56,189,248,0.04) 0%, transparent 50%);
+    body {
+      background-color: #0c0d0f;
+      color: #f4f4f6;
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Custom thin scrollbars */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #1a2540; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #2a3a60; }
-
-    /* Glass card styling */
-    .glass {
-      background: rgba(12, 17, 32, 0.85);
-      border: 1px solid rgba(255,255,255,0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-    .glass-dark {
-      background: rgba(5, 8, 15, 0.9);
-      border: 1px solid rgba(255,255,255,0.05);
+    /* Three.js Atmospheric Background Canvas */
+    #three-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
     }
 
-    /* Animated status indicators */
-    @keyframes livepulse {
-      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-      50% { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 0 5px rgba(239,68,68,0); }
+    /* Subtle background grid pattern (quiet & industrial, not sci-fi) */
+    .grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
-    .live-dot { animation: livepulse 1.6s infinite; }
 
-    @keyframes greenpulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
-      50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+    /* Human-crafted card design */
+    .surface-card {
+      background: #121418;
+      border: 1px solid rgba(255, 255, 255, 0.065);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      transition: border-color 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .status-dot { animation: greenpulse 2.4s infinite; }
+    .surface-card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
 
-    /* Realistic Indian HSRP Plate */
-    .hsrp-plate {
+    /* Tactile button micro-physics (Emil Kowalski) */
+    .btn-tactile {
+      transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-tactile:active {
+      transform: scale(0.975);
+    }
+
+    /* Segmented Control Track (macOS / Linear style) */
+    .segmented-track {
+      background: #181a20;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .segmented-item {
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #a1a1aa;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .segmented-item:hover {
+      color: #f4f4f6;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .segmented-item.active {
+      background: #242731;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* Authentic Chromatically Accurate Indian HSRP Plate */
+    .hsrp-badge {
       display: inline-flex;
       align-items: center;
       background: #ffffff;
-      border: 1.5px solid #111827;
+      border: 1.5px solid #181a20;
       border-radius: 5px;
-      padding: 2px 7px 2px 0px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.5);
+      padding: 1px 7px 1px 0px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
       font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      color: #111827;
+      font-weight: 700;
+      color: #0f172a;
       letter-spacing: 0.08em;
       line-height: 1;
       white-space: nowrap;
       user-select: none;
     }
-    .hsrp-plate .ind-strip {
-      background: #1a3fa0;
-      color: #fff;
+    .hsrp-badge .ind-strip {
+      background: #103894; /* Official Indian HSRP Ultramarine Blue */
+      color: #ffffff;
       font-size: 7px;
-      font-weight: 700;
+      font-weight: 800;
       font-family: 'Inter', sans-serif;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       padding: 3px 3px;
       border-radius: 3px 0 0 3px;
       margin-right: 6px;
@@ -118,366 +191,357 @@
       align-items: center;
       justify-content: center;
     }
-    .hsrp-plate .plate-chars { font-size: 14px; }
-    .hsrp-plate.large .plate-chars { font-size: 18px; }
-    .hsrp-plate.large .ind-strip { min-height: 30px; font-size: 8px; }
+    .hsrp-badge.lg .ind-strip { min-height: 28px; font-size: 7.5px; }
+    .hsrp-badge .plate-text { font-size: 13px; }
+    .hsrp-badge.lg .plate-text { font-size: 15px; }
 
-    @media (min-width: 640px) {
-      .hsrp-plate .plate-chars { font-size: 16px; }
-      .hsrp-plate.large .plate-chars { font-size: 22px; }
-      .hsrp-plate.large .ind-strip { min-height: 34px; font-size: 9px; }
-    }
-
-    /* Confidence bar */
-    .conf-bar-track {
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 99px;
-      overflow: hidden;
-      width: 100%;
-    }
-    .conf-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.6s ease;
+    /* Crisp Executive Numeric Typography (Zero sci-fi/terminal weirdness) */
+    .kpi-val {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "cv02" 1, "cv03" 1, "cv04" 1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
     }
 
-    /* Animation for incoming dossier card */
-    @keyframes slideInDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .dossier-entry { animation: slideInDown 0.3s ease forwards; }
+    /* Custom thin scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #22252e; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
-    /* Red pulse for flagged/blacklisted vehicles */
-    @keyframes alertglow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
-      50% { box-shadow: 0 0 16px 4px rgba(239,68,68,0.15); }
+    /* Max-Confidence Live In-Place Upgrade Ripple */
+    @keyframes upgradeRipple {
+      0% { border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25); }
+      100% { border-color: rgba(255, 255, 255, 0.065); box-shadow: none; }
     }
-    .alert-card { animation: alertglow 2s infinite; }
-
-    .kpi-num { font-variant-numeric: tabular-nums; }
-
-    /* Pill Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      padding: 2px 7px;
-      border-radius: 99px;
-      font-size: 9.5px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
+    .card-upgraded {
+      animation: upgradeRipple 1.2s ease-out forwards;
     }
-    .badge-clear { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-    .badge-alert { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.4); }
-    .badge-warn  { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-    .badge-info  { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
-
-    /* Feed switcher buttons */
-    .feed-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      border: 1px solid transparent;
-      white-space: nowrap;
-      flex: 1 1 auto;
-      text-align: center;
-    }
-    .feed-btn:active { transform: scale(0.98); }
-    .feed-btn-webcam {
-      background: linear-gradient(135deg, #0891b2 0%, #1d4ed8 100%);
-      color: white;
-      border-color: rgba(14,165,233,0.4);
-      box-shadow: 0 2px 8px rgba(14,165,233,0.2);
-    }
-    .feed-btn-cctv {
-      background: rgba(245,158,11,0.1);
-      color: #fbbf24;
-      border-color: rgba(245,158,11,0.3);
-    }
-    .feed-btn-video {
-      background: rgba(139,92,246,0.1);
-      color: #c4b5fd;
-      border-color: rgba(139,92,246,0.3);
-    }
-
-    .sep { border-color: rgba(255,255,255,0.06); }
-
-    /* Surveillance scan line effect */
-    .scan-overlay {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.04) 2px,
-        rgba(0,0,0,0.04) 4px
-      );
-      pointer-events: none;
-    }
-
-    /* Reticle corner brackets */
-    .corner { position: absolute; width: 14px; height: 14px; }
-    .corner-tl { top: 8px; left: 8px; border-top: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-tr { top: 8px; right: 8px; border-top: 2px solid #10b981; border-right: 2px solid #10b981; }
-    .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #10b981; border-left: 2px solid #10b981; }
-    .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #10b981; border-right: 2px solid #10b981; }
   </style>
 </head>
 
-<body class="text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
+<body class="min-h-screen grid-pattern selection:bg-blue-600/30 selection:text-white relative">
 
-  <!-- ═══════════════════════════════════════════ HEADER ═══════════════════════════════════════════ -->
-  <header class="sticky top-0 z-50 border-b sep" style="background: rgba(5,8,15,0.95); backdrop-filter: blur(24px);">
-    <div class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
+  <!-- Interactive Three.js Atmospheric Background Canvas -->
+  <canvas id="three-canvas"></canvas>
 
-      <!-- Brand -->
-      <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
-        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.35);">
-          <i data-lucide="shield-check" class="text-emerald-400" style="width:17px;height:17px;"></i>
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 1. TOP NAVIGATION / APP BAR (Linear / Vercel Precision Style)      -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <header class="sticky top-0 z-40 relative border-b border-white/[0.07] bg-[#0c0d0f]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Status -->
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-100">
+          <i data-lucide="shield-check" class="w-4 h-4 text-blue-400"></i>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-1.5 sm:gap-2">
-            <span class="text-sm sm:text-[15px] font-bold tracking-tight text-white whitespace-nowrap">Aegis<span class="text-emerald-400">ANPR</span></span>
-            <span class="text-[8.5px] sm:text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);">v2.0</span>
-          </div>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 truncate hidden xs:block leading-none mt-0.5">Surveillance AI &amp; Vahan Dossier</p>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm tracking-tight text-zinc-100">Aegis<span class="text-blue-400 font-bold">ANPR</span></span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-800/80 text-zinc-400 border border-white/5">v2.4</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 pl-3 border-l border-white/[0.08]">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="text-xs text-zinc-400 font-medium" id="header-status-label">Inference Engine Online</span>
         </div>
       </div>
 
-      <!-- Live channel pill visible on ALL screens -->
-      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-        <span class="text-[10px] sm:text-[10.5px] text-slate-400">Channel:</span>
-        <span class="text-[10.5px] sm:text-[11px] font-semibold text-slate-200 max-w-[120px] xs:max-w-[180px] sm:max-w-[220px] truncate" id="current-channel-label">Main Gate Inbound</span>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-        <button onclick="openRtspModal()" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-slate-200 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-          <i data-lucide="sliders-horizontal" style="width:13px;height:13px;color:#22d3ee;"></i>
-          <span>Connect Stream</span>
+      <!-- Center: Segmented Stream Switcher Track -->
+      <nav class="hidden md:flex items-center segmented-track">
+        <button onclick="switchStream('test_samples/kaggle_anpr_video.mp4', 'Kaggle ANPR Video')" class="segmented-item active btn-tactile" id="seg-kaggle">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+          <span>Kaggle Dataset</span>
         </button>
+        <button onclick="switchStream('test_samples/cars_extended.mp4', 'Highway Toll Plaza Lane 04')" class="segmented-item btn-tactile" id="seg-toll">
+          <span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+          <span>Toll Plaza</span>
+        </button>
+        <button onclick="switchStream('0', 'Laptop Live Webcam')" class="segmented-item btn-tactile" id="seg-webcam">
+          <span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+          <span>Webcam</span>
+        </button>
+        <button onclick="openRtspModal()" class="segmented-item btn-tactile" id="seg-rtsp">
+          <i data-lucide="sliders-horizontal" class="w-3 h-3 text-zinc-500"></i>
+          <span>RTSP Channel</span>
+        </button>
+      </nav>
 
-        <a href="/api/export" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] font-semibold text-emerald-300 transition" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);">
-          <i data-lucide="download" style="width:13px;height:13px;"></i>
-          <span>CSV</span>
+      <!-- Right Controls: IST Clock, Export CSV, API Docs -->
+      <div class="flex items-center gap-2.5">
+        <div class="hidden lg:flex flex-col text-right font-mono text-[11px] leading-tight text-zinc-400 pr-3 border-r border-white/[0.08]">
+          <span id="live-time-ticker" class="text-zinc-200 font-medium">--:--:-- IST</span>
+          <span class="text-[9.5px] text-zinc-500">LOCAL SURVEILLANCE</span>
+        </div>
+
+        <a href="/api/export" class="btn-tactile flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-200 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.08] transition shadow-inset-btn">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-zinc-400"></i>
+          <span class="hidden sm:inline">Export Audit</span>
+        </a>
+
+        <a href="/docs" target="_blank" class="btn-tactile p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 bg-zinc-800/60 hover:bg-zinc-800 border border-white/[0.06] transition" title="Swagger API Documentation">
+          <i data-lucide="code" class="w-4 h-4"></i>
         </a>
       </div>
+
     </div>
   </header>
 
-  <!-- ═══════════════════════════════════════════ MAIN CONTENT ═══════════════════════════════════════════ -->
-  <main class="w-full max-w-[1800px] mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
-    <!-- ── KPI STATS ── -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 2. MAIN APPLICATION WORKSPACE                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <main class="relative z-10 max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-4 space-y-2.5 sm:space-y-3.5">
 
-      <!-- Total Scanned -->
-      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
-        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Total Scanned</p>
-        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-total">—</div>
-        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">All-time detections</p>
+    <!-- ── METRICS TELEMETRY STRIP (Compact & Data-Dense) ─────────────── -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3" id="kpi-strip">
+      
+      <!-- Total Vehicles Audited -->
+      <div class="surface-card p-2.5 sm:p-3.5">
+        <div class="flex items-center justify-between text-zinc-400 mb-0.5 sm:mb-1">
+          <span class="text-[10px] sm:text-[10.5px] font-medium tracking-wide uppercase text-zinc-500">Total Audited</span>
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-zinc-500"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5 flex-wrap">
+          <span class="text-xl sm:text-2xl text-zinc-100 kpi-val" id="stat-total-volume">--</span>
+          <span class="text-[10px] text-emerald-400 font-medium">Online</span>
+        </div>
+        <p class="text-[10px] sm:text-[10.5px] text-zinc-500 mt-0.5 truncate">Total vehicle logs</p>
       </div>
 
-      <!-- Today's Traffic -->
-      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
-        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Today's Traffic</p>
-        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-white kpi-num" id="stat-today">—</div>
-        <p class="text-[9.5px] sm:text-[11px] text-emerald-400 mt-0.5 sm:mt-1 truncate font-medium kpi-num" id="stat-unique">— unique</p>
+      <!-- Today's Volume & Unique -->
+      <div class="surface-card p-2.5 sm:p-3.5">
+        <div class="flex items-center justify-between text-zinc-400 mb-0.5 sm:mb-1">
+          <span class="text-[10px] sm:text-[10.5px] font-medium tracking-wide uppercase text-zinc-500">Today's Volume</span>
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-zinc-500"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5 flex-wrap">
+          <span class="text-xl sm:text-2xl text-zinc-100 kpi-val" id="stat-today-volume">--</span>
+          <span class="text-[10px] text-zinc-400" id="stat-unique-today">(0 unique)</span>
+        </div>
+        <p class="text-[10px] sm:text-[10.5px] text-zinc-500 mt-0.5 truncate">24-hour throughput</p>
       </div>
 
-      <!-- AI Accuracy -->
-      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
-        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">AI Accuracy</p>
-        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-emerald-400 kpi-num" id="stat-accuracy">—%</div>
-        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Indian RTO verified</p>
+      <!-- AI Recognition Accuracy -->
+      <div class="surface-card p-2.5 sm:p-3.5">
+        <div class="flex items-center justify-between text-zinc-400 mb-0.5 sm:mb-1">
+          <span class="text-[10px] sm:text-[10.5px] font-medium tracking-wide uppercase text-zinc-500">OCR Accuracy</span>
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5 flex-wrap">
+          <span class="text-xl sm:text-2xl text-emerald-400 kpi-val" id="stat-accuracy">--%</span>
+          <span class="text-[10px] text-zinc-400">PaddleOCR</span>
+        </div>
+        <p class="text-[10px] sm:text-[10.5px] text-zinc-500 mt-0.5 truncate">Validated plates</p>
       </div>
 
-      <!-- Security Alerts -->
-      <div class="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 relative overflow-hidden">
-        <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-500">Alerts</p>
-        <div class="mt-1 sm:mt-2 font-mono font-bold text-xl sm:text-3xl text-amber-400 kpi-num" id="stat-flagged">—</div>
-        <p class="text-[9.5px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Gov flag / Unverified</p>
+      <!-- Security Watchlist Alerts -->
+      <div class="surface-card p-2.5 sm:p-3.5" id="card-alerts">
+        <div class="flex items-center justify-between text-zinc-400 mb-0.5 sm:mb-1">
+          <span class="text-[10px] sm:text-[10.5px] font-medium tracking-wide uppercase text-zinc-500">Hotlist Flags</span>
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-400"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5 flex-wrap">
+          <span class="text-xl sm:text-2xl text-red-400 kpi-val" id="stat-flagged">--</span>
+          <span class="text-[10px] text-zinc-400">Review</span>
+        </div>
+        <p class="text-[10px] sm:text-[10.5px] text-zinc-500 mt-0.5 truncate">Flagged vehicles</p>
       </div>
 
     </section>
 
-    <!-- ── LIVE MONITOR + LIVE DOSSIER ── -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-      <!-- ── LEFT: Live Video Feed (12 cols mobile, 5 cols desktop) ── -->
-      <div class="lg:col-span-5 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col">
+    <!-- ── CORE SURVEILLANCE & DOSSIER GRID (7 / 5 SPLIT) ─────────────── -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3.5 items-start">
 
-        <!-- Feed status bar with Camera Flip button -->
-        <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b sep" style="background:rgba(5,8,15,0.6);">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot flex-shrink-0"></span>
-            <span class="text-[10.5px] sm:text-[11px] font-bold tracking-widest uppercase text-white">Live Camera</span>
+      <!-- ── LEFT: VIDEO MONITOR (7 COLS) ────────────────────────────── -->
+      <div class="lg:col-span-7 space-y-2.5">
+        <div class="surface-card overflow-hidden">
+          
+          <!-- Monitor Header Bar -->
+          <div class="px-3.5 py-2 border-b border-white/[0.06] bg-[#15171d] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-medium text-xs text-zinc-200" id="player-feed-name">SURVEILLANCE FEED</span>
+              <span class="text-[10px] font-mono text-zinc-400 px-1.5 py-0.5 rounded bg-zinc-800 border border-white/5">MJPEG</span>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center gap-1">
+              <button onclick="reloadStream()" class="btn-tactile p-1 rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition" title="Refresh video socket">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="openRtspModal()" class="btn-tactile p-1 rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition" title="Configure camera channel">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button onclick="flipCamera()" class="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-cyan-300 transition" style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);" title="Switch camera (Front / Back / Stream)">
-              <i data-lucide="switch-camera" style="width:12px;height:12px;"></i>
-              <span>Flip Camera</span>
-            </button>
-            <span class="text-[9.5px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full hidden xs:inline" style="background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);">YOLO · OCR</span>
-          </div>
-        </div>
 
-        <!-- 1-Click Stream switch buttons (Responsive flex wrap) -->
-        <div class="px-3 sm:px-4 py-2.5 border-b sep" style="background:rgba(5,8,15,0.4);">
-          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-2">Input Source &amp; Video Test Footage</p>
-          <div class="flex flex-wrap gap-1.5 sm:gap-2">
-            <button class="feed-btn feed-btn-webcam" onclick="switchStream('0', 'Laptop Webcam')">
-              <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              <span>Webcam</span>
-            </button>
-            <button class="feed-btn feed-btn-cctv" onclick="openRtspModal()">
-              <i data-lucide="cctv" style="width:13px;height:13px;"></i>
-              <span>CCTV RTSP</span>
-            </button>
-            <button class="feed-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3);" onclick="switchStream('test_samples/cars_extended.mp4', 'Intel Toll Booth Footage')">
-              <i data-lucide="check-circle" style="width:13px;height:13px;"></i>
-              <span>Toll Booth (Intel)</span>
-            </button>
-            <button class="feed-btn feed-btn-video" onclick="switchStream('test_samples/indian_traffic_test.mp4', 'Indian Highway Traffic')">
-              <i data-lucide="film" style="width:13px;height:13px;"></i>
-              <span>Indian Traffic</span>
-            </button>
-            <label class="feed-btn cursor-pointer" style="background:rgba(255,255,255,0.05);color:#94a3b8;border-color:rgba(255,255,255,0.1);">
-              <i data-lucide="upload" style="width:13px;height:13px;color:#38bdf8;"></i>
-              <span>Upload MP4</span>
-              <input type="file" id="video-file-input" accept="video/mp4,video/avi,video/mkv" class="hidden" onchange="uploadVideoFile(this)">
+          <!-- Video Monitor Frame (Clean 16:9 Cinema Viewport) -->
+          <div class="relative bg-black aspect-video flex items-center justify-center overflow-hidden">
+            
+            <img
+              id="live-video-player"
+              src="/video_feed"
+              alt="Surveillance Feed"
+              class="w-full h-full object-contain"
+              onload="hideStreamError()"
+              onerror="handleStreamError()"
+            />
+
+            <!-- Clean Reconnect Status Modal -->
+            <div id="stream-error-overlay" class="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-black/90 backdrop-blur-sm hidden z-20">
+              <i data-lucide="video-off" class="w-6 h-6 text-zinc-400 animate-pulse"></i>
+              <div class="text-center">
+                <p class="text-xs font-medium text-zinc-200">Connecting Video Pipeline...</p>
+                <p class="text-[11px] text-zinc-500 font-mono mt-0.5">Acquiring MJPEG feed</p>
+              </div>
+              <button onclick="reloadStream()" class="btn-tactile mt-1 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium rounded border border-white/10 transition">
+                Retry Connection
+              </button>
+            </div>
+
+            <!-- Subdued Channel Tag -->
+            <div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md border border-white/10 text-[10.5px] font-mono text-zinc-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span id="viewport-channel-tag">Kaggle ANPR Video Sample</span>
+            </div>
+
+          </div>
+
+          <!-- Monitor Toolstrip & File Upload (Mobile Horizontal Scrollable) -->
+          <div class="px-2.5 py-2 border-t border-white/[0.06] bg-[#15171d] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5">
+            
+            <!-- Quick Channel Switches (Horizontal scroll on mobile) -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-0.5 sm:pb-0 scrollbar-none flex-1">
+              <button onclick="switchStream('test_samples/kaggle_anpr_video.mp4', 'Kaggle ANPR Video')" class="btn-tactile px-2 py-1 rounded text-[11px] font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] transition whitespace-nowrap flex-shrink-0" id="btn-sub-kaggle">
+                Kaggle Video
+              </button>
+              <button onclick="switchStream('test_samples/cars_extended.mp4', 'Highway Toll Plaza Lane 04')" class="btn-tactile px-2 py-1 rounded text-[11px] font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] transition whitespace-nowrap flex-shrink-0" id="btn-sub-toll">
+                Toll Plaza
+              </button>
+              <button onclick="switchStream('0', 'Laptop Live Webcam')" class="btn-tactile px-2 py-1 rounded text-[11px] font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] transition whitespace-nowrap flex-shrink-0" id="btn-sub-webcam">
+                Webcam
+              </button>
+              <button onclick="switchStream('test_samples/indian_traffic_test.mp4', 'Indian Highway Traffic')" class="btn-tactile px-2 py-1 rounded text-[11px] font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] transition whitespace-nowrap flex-shrink-0" id="btn-sub-traffic">
+                Indian Traffic
+              </button>
+            </div>
+
+            <!-- Upload Custom File -->
+            <label class="btn-tactile flex-shrink-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium text-zinc-200 bg-zinc-800 hover:bg-zinc-700 border border-white/10 transition cursor-pointer">
+              <i data-lucide="upload" class="w-3 h-3 text-zinc-400"></i>
+              <span id="upload-btn-label">Upload Video</span>
+              <input type="file" id="video-file-input" accept="video/mp4,video/avi,video/mkv,video/quicktime,.zip" class="hidden" onchange="uploadVideoFile(this)">
             </label>
+
           </div>
+
         </div>
-
-        <!-- Video stream frame -->
-        <div class="relative bg-black w-full flex items-center justify-center overflow-hidden aspect-[4/3] xs:aspect-video sm:aspect-video lg:min-h-[290px]">
-          <img
-            id="live-video-player"
-            src="/video_feed"
-            alt="Live ANPR Feed"
-            class="w-full h-full object-contain"
-            onerror="this.parentElement.innerHTML='<div class=\'absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-600 p-4 text-center\'><i data-lucide=\'video-off\' style=\'width:32px;height:32px;\'></i><span class=\'text-xs\'>Stream connecting...</span></div>'; lucide.createIcons();"
-          />
-          <div class="scan-overlay"></div>
-          <div class="corner corner-tl"></div>
-          <div class="corner corner-tr"></div>
-          <div class="corner corner-bl"></div>
-          <div class="corner corner-br"></div>
-
-          <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-mono font-semibold text-slate-200 max-w-[85%] truncate" style="background:rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot flex-shrink-0"></span>
-            <span id="player-feed-name" class="truncate">Gate 01 Inbound</span>
-          </div>
-        </div>
-
-        <!-- Quick tip -->
-        <div class="px-3.5 py-2 flex items-start gap-2 border-t sep" style="background:rgba(14,165,233,0.04);">
-          <i data-lucide="lightbulb" style="width:13px;height:13px;color:#22d3ee;flex-shrink:0;margin-top:2px;"></i>
-          <p class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
-            <span class="text-cyan-300 font-semibold">Tip:</span> Use <strong>Flip Camera</strong> above to cycle cameras or switch to camera index 1.
-          </p>
-        </div>
-
       </div>
 
-      <!-- ── RIGHT: Instant Dossier Stream (12 cols mobile, 7 cols desktop) ── -->
-      <div class="lg:col-span-7 glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-[520px] sm:h-[580px]">
 
-        <!-- Feed header -->
-        <div class="px-4 sm:px-5 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.6);">
-          <div class="flex items-center gap-2">
-            <i data-lucide="fingerprint" style="width:15px;height:15px;color:#34d399;"></i>
-            <h2 class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Live Identity Dossier</h2>
+      <!-- ── RIGHT: LIVE IDENTITY DOSSIER STREAM (5 COLS) ─────────────── -->
+      <div class="lg:col-span-5 space-y-2.5">
+        <div class="surface-card overflow-hidden flex flex-col min-h-[140px] max-h-[380px] lg:h-[520px]">
+          
+          <!-- Dossier Header -->
+          <div class="px-3.5 py-2 border-b border-white/[0.06] bg-[#15171d] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-zinc-400"></i>
+              <h2 class="font-medium text-xs uppercase tracking-wide text-zinc-200">Live Identity Dossier</h2>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span class="text-[10px] font-mono text-zinc-400">Active Feed</span>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
-            <span class="text-[9.5px] sm:text-[10px] font-mono text-slate-500">WebSocket Push</span>
+
+          <!-- Dossier Scroll Area -->
+          <div id="dossier-feed" class="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2">
+            
+            <!-- Empty Placeholder (Clean, compact, no awkward dead gaps) -->
+            <div id="dossier-empty" class="py-5 px-3 flex flex-col items-center justify-center text-center text-zinc-500">
+              <i data-lucide="camera" class="w-5 h-5 text-zinc-600 mb-1"></i>
+              <p class="text-xs font-medium text-zinc-400">Awaiting Vehicle Passes</p>
+              <p class="text-[10.5px] text-zinc-500 mt-0.5 max-w-xs">Passing vehicles lock in here with max-confidence crops and RTO registry details.</p>
+            </div>
+
           </div>
+
+          <!-- Dossier Footer -->
+          <div class="px-3.5 py-1.5 border-t border-white/[0.06] bg-[#15171d] flex items-center justify-between text-[10.5px] font-mono text-zinc-400">
+            <span>De-duplication: <strong class="text-zinc-200 font-medium">Enabled</strong></span>
+            <span>Max-Confidence Filter: <strong class="text-emerald-400 font-medium">Locked</strong></span>
+          </div>
+
         </div>
-
-        <!-- Scrollable Dossier Feed -->
-        <div id="dossier-feed" class="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-2.5 sm:space-y-3">
-          <div id="dossier-empty" class="flex flex-col items-center justify-center h-full py-12 gap-2.5 text-slate-600 text-center px-4">
-            <i data-lucide="scan-line" style="width:36px;height:36px;opacity:0.4;"></i>
-            <p class="text-xs font-medium text-slate-400">Waiting for vehicle detections...</p>
-            <p class="text-[10.5px] text-slate-600">Snapshots &amp; Vahan owner data appear here in real time</p>
-          </div>
-        </div>
-
       </div>
+
     </section>
 
-    <!-- ── SEARCH & AUDIT LOG TABLE ── -->
-    <section class="glass rounded-xl sm:rounded-2xl overflow-hidden">
 
-      <!-- Header & search controls -->
-      <div class="px-4 sm:px-5 py-3.5 border-b sep flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="background:rgba(5,8,15,0.5);">
-        <div>
-          <h2 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
-            <i data-lucide="database" style="width:14px;height:14px;color:#60a5fa;"></i>
-            Vehicle Movement Archive
-          </h2>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Filter by plate, state code, or security status</p>
+    <!-- ── AUDIT SURVEILLANCE LEDGER TABLE ───────────────────────────── -->
+    <section class="surface-card overflow-hidden space-y-0">
+      
+      <!-- Table Search & Filter Toolbar (Responsive Flex) -->
+      <div class="p-3 border-b border-white/[0.06] bg-[#15171d] flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        
+        <div class="flex items-center gap-2">
+          <i data-lucide="database" class="w-4 h-4 text-zinc-400"></i>
+          <div>
+            <h3 class="font-medium text-xs text-zinc-200 tracking-tight">Audit Surveillance Ledger</h3>
+            <p class="text-[10.5px] text-zinc-500">Verified vehicle passes with RTO registration logs</p>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-          <!-- Search input -->
+        <!-- Filters (Full width on mobile, inline on desktop) -->
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap sm:flex-nowrap">
+          
+          <!-- Search Plate Input -->
           <div class="relative flex-1 sm:flex-initial">
-            <i data-lucide="search" style="width:12px;height:12px;position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#64748b;"></i>
+            <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
             <input
               type="text"
               id="search-input"
-              placeholder="Search plate or state..."
-              class="w-full sm:w-48 text-[11.5px] rounded-lg font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition"
-              style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:6px 10px 6px 28px;"
-            />
+              placeholder="Search plate number..."
+              class="pl-8 pr-3 py-1 rounded bg-[#181a20] border border-white/[0.08] text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 w-full sm:w-48 font-mono transition"
+            >
           </div>
 
-          <!-- Alert checkbox -->
-          <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer text-[10.5px] font-semibold text-slate-300 select-none flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-            <input type="checkbox" id="flagged-only-checkbox" class="rounded" style="accent-color:#ef4444;">
-            <span>Alerts only</span>
+          <!-- Flagged Only Toggle -->
+          <label class="flex items-center gap-1.5 text-xs text-zinc-300 bg-[#181a20] px-2.5 py-1 rounded border border-white/[0.08] cursor-pointer hover:bg-zinc-800 transition whitespace-nowrap flex-shrink-0">
+            <input type="checkbox" id="flagged-only-checkbox" class="rounded bg-black/40 border-white/20 text-blue-500 focus:ring-0">
+            <span>Flagged Only</span>
           </label>
 
-          <button onclick="loadHistory()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-            <i data-lucide="refresh-cw" style="width:11px;height:11px;"></i>
-            <span>Refresh</span>
+          <!-- Refresh Button -->
+          <button onclick="loadHistory()" class="btn-tactile p-1.5 rounded bg-[#181a20] hover:bg-zinc-800 border border-white/[0.08] text-zinc-400 hover:text-zinc-100 transition flex-shrink-0" title="Refresh ledger table">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
           </button>
+
         </div>
+
       </div>
 
-      <!-- Scrollable table container -->
-      <div class="w-full overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[750px]">
+      <!-- Clean Data Table with horizontal scroll support on touch devices -->
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse min-w-[660px]">
           <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(5,8,15,0.7);">
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Time</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Visuals</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Plate</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Confidence</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Verification</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Security</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Vehicle &amp; Owner</th>
-              <th class="px-3.5 py-2.5 text-[9.5px] font-bold uppercase tracking-widest text-slate-500 whitespace-nowrap">Registered Address</th>
+            <tr class="border-b border-white/[0.06] bg-[#121418] text-[10.5px] font-mono uppercase tracking-wider text-zinc-400">
+              <th class="py-2.5 px-3">Time</th>
+              <th class="py-2.5 px-3">Vehicle Snapshot & Plate</th>
+              <th class="py-2.5 px-3">Plate Number</th>
+              <th class="py-2.5 px-3">Confidence</th>
+              <th class="py-2.5 px-3">Validation</th>
+              <th class="py-2.5 px-3">Security Flag</th>
+              <th class="py-2.5 px-3">Vehicle & Registered Owner</th>
+              <th class="py-2.5 px-3">RTO Address</th>
             </tr>
           </thead>
-          <tbody id="history-table-body" class="text-slate-300 text-xs divide-y divide-white/5">
-            <tr>
-              <td colspan="8" class="px-4 py-8 text-center text-xs text-slate-600">Loading records...</td>
-            </tr>
+          <tbody id="history-table-body" class="divide-y divide-white/[0.04] text-xs">
+            <!-- Dynamically populated -->
           </tbody>
         </table>
       </div>
@@ -486,150 +550,453 @@
 
   </main>
 
-  <!-- ════════════════════ RTSP / CCTV CONNECTION MODAL ════════════════════ -->
-  <div id="rtsp-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);">
-    <div class="glass rounded-xl sm:rounded-2xl overflow-hidden w-full max-w-lg shadow-2xl">
-      <!-- header -->
-      <div class="px-4 sm:px-5 py-3.5 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 3. RTSP / CHANNEL CONFIGURATION MODAL                              -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div id="rtsp-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm hidden">
+    <div class="surface-card w-full max-w-lg p-4 sm:p-5 space-y-3.5 sm:space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
         <div class="flex items-center gap-2">
-          <i data-lucide="video" style="width:15px;height:15px;color:#22d3ee;"></i>
-          <h3 class="text-xs sm:text-sm font-bold text-white">Connect CCTV / IP Camera</h3>
+          <i data-lucide="video" class="w-4 h-4 text-zinc-300"></i>
+          <h3 class="font-medium text-sm text-zinc-100">Camera Stream Configuration</h3>
         </div>
-        <button onclick="closeRtspModal()" class="text-slate-500 hover:text-white transition p-1">
-          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        <button onclick="closeRtspModal()" class="btn-tactile p-1 rounded text-zinc-400 hover:text-zinc-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- body -->
-      <div class="p-4 sm:p-5 space-y-3.5 text-xs">
-        <div>
-          <label class="block text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Stream URL (RTSP / HTTP / Webcam Index)</label>
-          <input
-            type="text"
-            id="modal-rtsp-input"
-            placeholder="rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101"
-            class="w-full text-xs font-mono text-slate-200 rounded-lg px-3 py-2 focus:outline-none transition"
-            style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"
-          />
-          <p class="text-[10px] text-slate-500 mt-1">Enter <code class="text-slate-400">0</code> or <code class="text-slate-400">1</code> for Webcams, or paste your RTSP stream link.</p>
-        </div>
-
-        <div>
-          <label class="block text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Camera Name / Location</label>
-          <input
-            type="text"
-            id="modal-cam-name"
-            placeholder="e.g. Main Gate Inbound Lane"
-            class="w-full text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none transition"
-            style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"
-          />
-        </div>
-
-        <!-- RTSP Templates -->
-        <div>
-          <p class="text-[9.5px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Quick-Fill Templates</p>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button onclick="setRtspTemplate('cp_plus')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">CP Plus</button>
-            <button onclick="setRtspTemplate('hikvision')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Hikvision</button>
-            <button onclick="setRtspTemplate('dahua')" class="py-1.5 rounded-lg text-[10.5px] font-semibold text-slate-300 transition text-center" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Dahua</button>
-          </div>
-        </div>
-
-        <div class="pt-2 flex justify-end gap-2 border-t sep">
-          <button onclick="closeRtspModal()" class="px-3.5 py-1.5 rounded-lg text-[11px] font-semibold text-slate-400 transition" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">Cancel</button>
-          <button onclick="submitCameraSwitch()" class="px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-950 flex items-center gap-1 transition" style="background:linear-gradient(135deg,#10b981,#059669);">
-            <i data-lucide="check" style="width:13px;height:13px;"></i> Switch Now
+      <!-- Presets -->
+      <div>
+        <label class="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">Vendor Templates</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <button onclick="setRtspTemplate('kaggle')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">Kaggle ANPR</span>
+            <span class="text-[10px] text-zinc-400">Benchmark Video</span>
+          </button>
+          <button onclick="setRtspTemplate('toll_plaza')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">Toll Plaza</span>
+            <span class="text-[10px] text-zinc-400">Lane 04 Sample</span>
+          </button>
+          <button onclick="setRtspTemplate('webcam')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">Laptop Webcam</span>
+            <span class="text-[10px] text-zinc-400">Device Index 0</span>
+          </button>
+          <button onclick="setRtspTemplate('cp_plus')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">CP Plus</span>
+            <span class="text-[10px] text-zinc-400">RTSP Stream 1</span>
+          </button>
+          <button onclick="setRtspTemplate('hikvision')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">Hikvision</span>
+            <span class="text-[10px] text-zinc-400">Channel 101</span>
+          </button>
+          <button onclick="setRtspTemplate('dahua')" class="btn-tactile p-2 rounded text-left text-xs bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/[0.07] text-zinc-200">
+            <span class="block font-semibold text-zinc-100">Dahua</span>
+            <span class="text-[10px] text-zinc-400">Realmonitor</span>
           </button>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ════════════════════ IMAGE LIGHTBOX MODAL ════════════════════ -->
-  <div id="image-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);">
-    <div class="glass rounded-xl sm:rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl">
-      <div class="px-4 py-3 border-b sep flex items-center justify-between" style="background:rgba(5,8,15,0.7);">
-        <h3 class="text-xs sm:text-sm font-semibold text-white" id="modal-title">Verification Snapshot</h3>
-        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition p-1">
-          <i data-lucide="x" style="width:16px;height:16px;"></i>
+      <!-- Inputs -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Stream Source (RTSP URL or 0)</label>
+          <input type="text" id="modal-rtsp-input" placeholder="rtsp://admin:pass@192.168.1.100:554/live" class="w-full px-3 py-1.5 rounded bg-black/60 border border-white/10 text-xs text-zinc-100 font-mono focus:outline-none focus:border-zinc-400 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Channel Label</label>
+          <input type="text" id="modal-cam-name" placeholder="Main Inbound Gate 01" class="w-full px-3 py-1.5 rounded bg-black/60 border border-white/10 text-xs text-zinc-100 focus:outline-none focus:border-zinc-400 transition">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+        <button onclick="closeRtspModal()" class="btn-tactile px-3.5 py-1.5 rounded text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">
+          Cancel
+        </button>
+        <button onclick="submitCameraSwitch()" class="btn-tactile px-4 py-1.5 rounded text-xs font-medium bg-zinc-100 hover:bg-white text-zinc-950 transition">
+          Switch Feed
         </button>
       </div>
-      <div class="p-3 sm:p-4 bg-black flex items-center justify-center max-h-[75vh]">
-        <img id="modal-image" src="" alt="Snapshot" class="rounded-lg object-contain max-h-[70vh] w-full">
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 4. LIGHTBOX MODAL                                                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div id="image-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm hidden" onclick="closeModal()">
+    <div class="relative max-w-4xl w-full surface-card p-3 space-y-2 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+        <h4 id="modal-title" class="font-medium text-xs text-zinc-200">Vehicle Visual Inspection</h4>
+        <button onclick="closeModal()" class="btn-tactile p-1 rounded text-zinc-400 hover:text-zinc-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="bg-black rounded-lg overflow-hidden flex items-center justify-center min-h-[300px] max-h-[75vh]">
+        <img id="modal-image" src="" alt="Inspection View" class="max-w-full max-h-[75vh] object-contain">
       </div>
     </div>
   </div>
 
-  <!-- ════════════════════════ APPLICATION SCRIPTS ════════════════════════ -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 5. JAVASCRIPT WORKSPACE CONTROLLER                                -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
   <script>
-    lucide.createIcons();
+    // ─── THREE.JS ATMOSPHERIC PARTICLE BACKGROUND ─────────────────────
+    (function initThreeBackground() {
+      if (typeof THREE === 'undefined') return;
+      const canvas = document.getElementById('three-canvas');
+      if (!canvas) return;
 
-    // ─── Camera Flip State ──────────────────────────────────────
-    let activeCamIndex = 0;
-    function flipCamera() {
-      activeCamIndex = activeCamIndex === 0 ? 1 : 0;
-      switchStream(activeCamIndex.toString(), `Camera Device ${activeCamIndex}`);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 85;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Create Constellation Particle Grid
+      const count = 550;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+
+      for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        positions[i3]     = (Math.random() - 0.5) * 160;
+        positions[i3 + 1] = (Math.random() - 0.5) * 110;
+        positions[i3 + 2] = (Math.random() - 0.5) * 90;
+
+        // Elegant palette: Sapphire Blue + Emerald Accent + Slate Silver
+        const r = Math.random();
+        if (r > 0.6) {
+          // Sapphire Blue (Linear / Verkada accent)
+          colors[i3]     = 0.23;
+          colors[i3 + 1] = 0.51;
+          colors[i3 + 2] = 0.96;
+        } else if (r > 0.4) {
+          // Leaf Emerald (Verified AI status)
+          colors[i3]     = 0.06;
+          colors[i3 + 1] = 0.72;
+          colors[i3 + 2] = 0.51;
+        } else {
+          // Soft Slate Luminescence
+          colors[i3]     = 0.6;
+          colors[i3 + 1] = 0.65;
+          colors[i3 + 2] = 0.75;
+        }
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 2.0,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending
+      });
+
+      const particleSystem = new THREE.Points(geometry, material);
+      scene.add(particleSystem);
+
+      // Subtle mouse & touch interaction
+      let mouseX = 0, mouseY = 0;
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX - window.innerWidth / 2) * 0.0003;
+        mouseY = (e.clientY - window.innerHeight / 2) * 0.0003;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+          mouseX = (e.touches[0].clientX - window.innerWidth / 2) * 0.0003;
+          mouseY = (e.touches[0].clientY - window.innerHeight / 2) * 0.0003;
+        }
+      }, { passive: true });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        particleSystem.rotation.y += 0.0007;
+        particleSystem.rotation.x += 0.0003;
+
+        camera.position.x += (mouseX * 35 - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * 35 - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }, { passive: true });
+    })();
+
+
+    // ─── INITIALIZATION & LIVE TICKER ─────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+
+      setInterval(() => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-IN', { hour12: false }) + ' IST';
+        const el = document.getElementById('live-time-ticker');
+        if (el) el.innerText = timeStr;
+      }, 1000);
+
+      // Subtle GSAP entrance
+      if (window.gsap) {
+        gsap.from('header', { y: -10, opacity: 0, duration: 0.4, ease: 'power2.out' });
+        gsap.from('#kpi-strip > div', { y: 10, opacity: 0, duration: 0.35, stagger: 0.04, ease: 'power2.out', delay: 0.05 });
+      }
+    });
+
+
+    // ─── STREAM SOCKET RECONNECTION ───────────────────────────────────
+    let streamRetryTimer = null;
+
+    function handleStreamError() {
+      const overlay = document.getElementById('stream-error-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+      clearTimeout(streamRetryTimer);
+      streamRetryTimer = setTimeout(reloadStream, 1500);
     }
 
-    // ─── Formatting Helpers ─────────────────────────────────────
-    function confColor(c) {
-      if (c >= 0.88) return '#10b981';
-      if (c >= 0.70) return '#f59e0b';
-      return '#ef4444';
+    function hideStreamError() {
+      clearTimeout(streamRetryTimer);
+      const overlay = document.getElementById('stream-error-overlay');
+      if (overlay) overlay.classList.add('hidden');
     }
 
-    function confBarHtml(confidence) {
-      const pct = Math.round(confidence * 100);
-      const color = confColor(confidence);
-      return `
-        <div style="min-width:80px;max-width:110px;">
-          <div class="flex items-center justify-between mb-0.5">
-            <span class="text-[10.5px] font-mono font-bold" style="color:${color};">${pct}%</span>
-          </div>
-          <div class="conf-bar-track">
-            <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
-          </div>
-        </div>`;
+    function reloadStream() {
+      const img = document.getElementById('live-video-player');
+      if (img) {
+        img.src = '/video_feed?t=' + Date.now();
+      }
     }
 
-    function hsrpBadge(plate, size='') {
-      return `<div class="hsrp-plate ${size}">
-        <span class="ind-strip">IND</span>
-        <span class="plate-chars">${plate}</span>
-      </div>`;
+
+    // ─── STREAM SWITCHING & SEGMENTED CONTROLS ────────────────────────
+    function updateSegmentedUI(key) {
+      document.querySelectorAll('.segmented-item').forEach(el => el.classList.remove('active'));
+      const activeNav = document.getElementById(`seg-${key}`);
+      if (activeNav) activeNav.classList.add('active');
     }
 
-    function securityBadge(flag) {
-      if (!flag) return '<span class="badge badge-info">—</span>';
-      const isAlert = flag.includes('BLACKLIST') || flag.includes('FLAG') || flag.includes('ALERT');
-      if (isAlert) return `<span class="badge badge-alert"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z"/><path d="M12 17h.01"/></svg>${flag}</span>`;
-      return `<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>CLEAR</span>`;
-    }
-
-    function verifyBadge(needs) {
-      if (needs) return '<span class="badge badge-warn"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Review</span>';
-      return '<span class="badge badge-clear"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>';
-    }
-
-    // ─── Stats Loader ───────────────────────────────────────────
-    async function loadStats() {
+    async function switchStream(source, name) {
       try {
-        const data = await fetch('/api/stats').then(r => r.json());
-        document.getElementById('stat-total').innerText    = data.total_vehicles_all_time;
-        document.getElementById('stat-today').innerText    = data.vehicles_today;
-        document.getElementById('stat-unique').innerText   = `${data.unique_vehicles_today} unique`;
-        document.getElementById('stat-accuracy').innerText = `${data.recognition_accuracy}%`;
-        document.getElementById('stat-flagged').innerText  = data.flagged_vehicles;
-        document.getElementById('current-channel-label').innerText = data.camera_name;
-        document.getElementById('player-feed-name').innerText      = data.camera_name;
-      } catch (e) { /* silent */ }
+        const tag = document.getElementById('viewport-channel-tag');
+        const feedLabel = document.getElementById('player-feed-name');
+        if (tag) tag.innerText = 'Connecting...';
+
+        if (source.includes('kaggle')) updateSegmentedUI('kaggle');
+        else if (source.includes('cars_extended')) updateSegmentedUI('toll');
+        else if (source === '0') updateSegmentedUI('webcam');
+        else updateSegmentedUI('rtsp');
+
+        const res = await fetch('/api/camera/switch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source, camera_name: name })
+        }).then(r => r.json());
+
+        if (tag) tag.innerText = res.camera_name;
+        if (feedLabel) feedLabel.innerText = res.camera_name;
+        reloadStream();
+      } catch (err) {
+        alert('Stream switch error: ' + err);
+      }
     }
 
-    // ─── History Table Loader ───────────────────────────────────
+    async function uploadVideoFile(input) {
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const label = document.getElementById('upload-btn-label');
+      const origText = label ? label.innerText : '';
+      if (label) label.innerText = `Uploading...`;
+
+      try {
+        const res = await fetch('/api/upload_video', {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+
+        if (res.status === 'success') {
+          const tag = document.getElementById('viewport-channel-tag');
+          const feedLabel = document.getElementById('player-feed-name');
+          if (tag) tag.innerText = res.camera_name;
+          if (feedLabel) feedLabel.innerText = res.camera_name;
+          document.querySelectorAll('.segmented-item').forEach(el => el.classList.remove('active'));
+          reloadStream();
+        } else {
+          alert('Upload failed: ' + (res.detail || 'Invalid video'));
+        }
+      } catch (e) {
+        alert('Upload network error: ' + e);
+      } finally {
+        if (label) label.innerText = origText;
+        input.value = '';
+      }
+    }
+
+
+    // ─── DOSSIER CARD GENERATION & UPGRADE (HUMAN CRAFTED) ────────────
+    function hsrpBadge(plateNum, size = 'sm') {
+      const clean = (plateNum || '—').toUpperCase();
+      const isLg = size === 'large';
+      return `
+        <div class="hsrp-badge ${isLg ? 'lg' : ''}">
+          <span class="ind-strip">IND</span>
+          <span class="plate-text">${clean}</span>
+        </div>
+      `;
+    }
+
+    function handleDossierEvent(d) {
+      if (d.action === 'update') {
+        const existingCard = document.getElementById(`dossier-card-${d.id}`);
+        if (existingCard) {
+          updateExistingCard(existingCard, d);
+          loadStats();
+          loadHistory();
+          return;
+        }
+      }
+      prependDossierCard(d);
+    }
+
+    function updateExistingCard(card, d) {
+      const pct = Math.round(d.ocr_confidence * 100);
+
+      // Upgrade Vehicle Photo
+      const carImg = card.querySelector('.car-img-target');
+      if (carImg) {
+        carImg.src = d.context_crop_url;
+        carImg.parentElement.onclick = () => openModal(d.context_crop_url, `Vehicle: ${d.vehicle_model}`);
+      }
+
+      // Upgrade Plate Crop
+      const plateImg = card.querySelector('.plate-img-target');
+      if (plateImg) {
+        plateImg.src = d.plate_crop_url;
+        plateImg.parentElement.onclick = () => openModal(d.plate_crop_url, `Plate: ${d.plate_number}`);
+      }
+
+      // Upgrade Plate Text
+      const badgeContainer = card.querySelector('.plate-badge-target');
+      if (badgeContainer) badgeContainer.innerHTML = hsrpBadge(d.plate_number, 'large');
+
+      // Upgrade Confidence Bar
+      const pctEl = card.querySelector('.conf-pct-target');
+      if (pctEl) pctEl.innerText = `${pct}%`;
+      const fillEl = card.querySelector('.conf-fill-target');
+      if (fillEl) fillEl.style.width = `${pct}%`;
+
+      // Trigger Subtle In-Place Upgrade Flash
+      card.classList.remove('card-upgraded');
+      void card.offsetWidth;
+      card.classList.add('card-upgraded');
+    }
+
+    function prependDossierCard(d) {
+      const feed = document.getElementById('dossier-feed');
+      const empty = document.getElementById('dossier-empty');
+      if (empty) empty.remove();
+
+      const isAlert = d.security_flag && (d.security_flag.includes('BLACKLIST') || d.security_flag.includes('FLAG') || d.security_flag.includes('ALERT'));
+      const pct = Math.round(d.ocr_confidence * 100);
+      const confColor = pct >= 85 ? '#10b981' : (pct >= 65 ? '#3b82f6' : '#f59e0b');
+
+      const card = document.createElement('div');
+      card.id = `dossier-card-${d.id}`;
+      card.className = `surface-card p-3 space-y-2.5 transition-all ${isAlert ? 'border-red-500/40 bg-red-950/10' : ''}`;
+
+      card.innerHTML = `
+        <!-- Card Header: HSRP Plate & Time -->
+        <div class="flex items-center justify-between gap-1.5 flex-wrap sm:flex-nowrap">
+          <div class="plate-badge-target">
+            ${hsrpBadge(d.plate_number, 'large')}
+          </div>
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <span class="text-[10.5px] font-mono text-zinc-400">${d.timestamp ? d.timestamp.split(' ')[1] : ''}</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium ${d.is_valid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+              ${d.is_valid ? 'VERIFIED' : 'REVIEW'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Middle Visuals: Large Vehicle Photo + Zoomable Plate -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          
+          <!-- Full Vehicle Image -->
+          <div class="relative cursor-pointer group w-28 sm:w-36 md:w-44 h-20 sm:h-24 md:h-28 rounded-lg overflow-hidden bg-black/60 border border-white/10 flex-shrink-0" onclick="openModal('${d.context_crop_url}', 'Vehicle: ${d.vehicle_model}')">
+            <img src="${d.context_crop_url}" class="car-img-target w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" onerror="this.src='https://placehold.co/200x140/121418/71717a?text=Vehicle'">
+            <span class="absolute bottom-1 left-1.5 text-[8px] font-mono font-semibold px-1 py-0.5 rounded bg-black/80 text-zinc-300">VEHICLE VIEW</span>
+          </div>
+
+          <!-- Plate Zoom & Metric -->
+          <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+            
+            <div class="relative cursor-pointer group w-full h-10 sm:h-12 rounded-lg overflow-hidden bg-black/70 border border-white/10 flex items-center justify-center" onclick="openModal('${d.plate_crop_url}', 'Plate: ${d.plate_number}')">
+              <img src="${d.plate_crop_url}" class="plate-img-target max-h-full max-w-full object-contain" onerror="this.src='https://placehold.co/120x50/121418/71717a?text=Plate'">
+              <span class="absolute bottom-0.5 left-1 text-[7px] font-mono text-zinc-500">PLATE CROP</span>
+            </div>
+
+            <!-- Minimal Confidence Meter -->
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-0.5 sm:mb-1">
+                <span>AI Confidence</span>
+                <span class="conf-pct-target font-sans font-semibold text-xs tabular-nums" style="color: ${confColor};">${pct}%</span>
+              </div>
+              <div class="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="conf-fill-target h-full rounded-full transition-all duration-300" style="width: ${pct}%; background: ${confColor};"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Bottom Grid: Vahan Registry Key-Value Dossier -->
+        <div class="grid grid-cols-2 gap-1.5 p-2 rounded-lg bg-[#0e1014] border border-white/[0.04] text-[11px]">
+          <div>
+            <span class="block text-[9.5px] font-medium uppercase text-zinc-400">Make / Model</span>
+            <span class="font-medium text-zinc-200 truncate block">${d.vehicle_model || '—'}</span>
+          </div>
+          <div>
+            <span class="block text-[9.5px] font-medium uppercase text-zinc-400">Registered Owner</span>
+            <span class="font-medium text-emerald-400 truncate block">${d.owner_name || '—'}</span>
+          </div>
+          <div class="col-span-2">
+            <span class="block text-[9.5px] font-medium uppercase text-zinc-400">RTO Location</span>
+            <span class="text-zinc-400 truncate block">${d.registered_address || '—'}</span>
+          </div>
+        </div>
+      `;
+
+      feed.insertBefore(card, feed.firstChild);
+      while (feed.children.length > 25) feed.removeChild(feed.lastChild);
+
+      loadStats();
+      loadHistory();
+    }
+
+
+    // ─── AUDIT LEDGER LOADER ──────────────────────────────────────────
     async function loadHistory() {
       const search = document.getElementById('search-input').value;
       const flaggedOnly = document.getElementById('flagged-only-checkbox').checked;
-      let url = `/api/detections?limit=30`;
+      let url = `/api/detections?limit=25`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
       if (flaggedOnly) url += `&flagged_only=true`;
 
@@ -638,221 +1005,126 @@
         const tbody = document.getElementById('history-table-body');
 
         if (!data.items || data.items.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-xs text-slate-600">No matching records found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-xs text-zinc-500 font-mono">No matching surveillance detections found.</td></tr>';
           return;
         }
 
-        tbody.innerHTML = data.items.map(item => `
-          <tr class="transition hover:bg-white/[0.02]" style="border-bottom:1px solid rgba(255,255,255,0.04);">
-            <td class="px-3.5 py-2.5 whitespace-nowrap">
-              <span class="font-mono text-[10.5px] text-slate-500">${item.timestamp}</span>
-            </td>
-            <td class="px-3.5 py-2.5 whitespace-nowrap">
-              <div class="flex items-center gap-1.5">
-                <img src="${item.plate_crop_url}" class="h-8 w-16 sm:w-20 object-cover rounded cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.plate_crop_url}','Plate: ${item.plate_number}')" title="View plate">
-                <img src="${item.context_crop_url}" class="h-8 w-12 sm:w-16 object-cover rounded cursor-pointer transition hover:scale-105" style="border:1px solid rgba(255,255,255,0.08);background:#000;" onclick="openModal('${item.context_crop_url}','Vehicle: ${item.plate_number}')" title="View vehicle">
-              </div>
-            </td>
-            <td class="px-3.5 py-2.5 whitespace-nowrap">
-              ${hsrpBadge(item.plate_number)}
-            </td>
-            <td class="px-3.5 py-2.5 whitespace-nowrap">
-              ${confBarHtml(item.ocr_confidence)}
-            </td>
-            <td class="px-3.5 py-2.5 whitespace-nowrap">${verifyBadge(item.needs_verification)}</td>
-            <td class="px-3.5 py-2.5 whitespace-nowrap">${securityBadge(item.security_flag)}</td>
-            <td class="px-3.5 py-2.5">
-              <div class="text-[11.5px] font-semibold text-slate-200">${item.vehicle_model}</div>
-              <div class="text-[10.5px] text-slate-500">${item.owner_name}</div>
-            </td>
-            <td class="px-3.5 py-2.5 text-[10.5px] text-slate-500 max-w-[160px] truncate" title="${item.registered_address}">
-              ${item.registered_address}
-            </td>
-          </tr>
-        `).join('');
-        lucide.createIcons();
-      } catch (e) { /* silent */ }
-    }
-
-    // ─── Real-Time Dossier Push ─────────────────────────────────
-    function prependDossierCard(d) {
-      const feed = document.getElementById('dossier-feed');
-      const empty = document.getElementById('dossier-empty');
-      if (empty) empty.remove();
-
-      const isAlert = d.security_flag && (d.security_flag.includes('BLACKLIST') || d.security_flag.includes('FLAG') || d.security_flag.includes('ALERT'));
-      const conf = d.ocr_confidence;
-      const pct = Math.round(conf * 100);
-      const color = confColor(conf);
-      const timeStr = d.timestamp ? (d.timestamp.split(' ')[1] || d.timestamp) : '';
-
-      const card = document.createElement('div');
-      card.className = `dossier-entry rounded-xl sm:rounded-2xl overflow-hidden ${isAlert ? 'alert-card' : ''}`;
-      card.style.cssText = isAlert
-        ? 'background:rgba(30,5,5,0.9);border:1px solid rgba(239,68,68,0.45);'
-        : 'background:rgba(15,22,40,0.85);border:1px solid rgba(255,255,255,0.07);';
-
-      card.innerHTML = `
-        <div class="p-3 sm:p-4">
-          <!-- Top row: Visuals + Plate & Confidence + Time -->
-          <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3">
-            
-            <!-- Visual Thumbnails -->
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <div class="relative cursor-pointer group" onclick="openModal('${d.plate_crop_url}','Plate: ${d.plate_number}')">
-                <img src="${d.plate_crop_url}"
-                  class="h-12 w-20 sm:h-14 sm:w-24 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105"
-                  style="border:1px solid rgba(255,255,255,0.1);background:#000;"
-                  onerror="this.src='https://placehold.co/100x50/090d18/334155?text=Plate'">
-                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">PLATE</span>
-              </div>
-              <div class="relative cursor-pointer group" onclick="openModal('${d.context_crop_url}','Vehicle: ${d.vehicle_model}')">
-                <img src="${d.context_crop_url}"
-                  class="h-12 w-16 sm:h-14 sm:w-20 object-cover rounded-lg sm:rounded-xl transition group-hover:scale-105"
-                  style="border:1px solid rgba(255,255,255,0.1);background:#000;"
-                  onerror="this.src='https://placehold.co/80x50/090d18/334155?text=Car'">
-                <span class="absolute bottom-1 left-1 text-[8px] sm:text-[9px] font-mono font-bold px-1 py-0.5 rounded" style="background:rgba(0,0,0,0.8);color:#94a3b8;">CAR</span>
-              </div>
-            </div>
-
-            <!-- Plate Badge + Status Badges -->
-            <div class="flex-1 min-w-0 w-full xs:w-auto">
-              <div class="flex flex-wrap items-center gap-2 mb-2">
-                ${hsrpBadge(d.plate_number, 'large')}
-                ${isAlert ? '<span class="badge badge-alert text-[10px]"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\'><path d=\'M12 9v4\'/><path d=\'M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636-2.87L13.637 3.59a1.914 1.914 0 0 0-3.274 0z\'/><path d=\'M12 17h.01\'/></svg>FLAGGED</span>' : ''}
-              </div>
-
-              <!-- Confidence Progress Bar -->
-              <div class="mb-2">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-[9.5px] uppercase font-bold tracking-wider text-slate-500">AI Confidence</span>
-                  <span class="font-mono text-xs font-bold" style="color:${color};">${pct}%</span>
+        tbody.innerHTML = data.items.map(item => {
+          const isAlert = item.security_flag && (item.security_flag.includes('BLACKLIST') || item.security_flag.includes('FLAG'));
+          const pct = Math.round(item.ocr_confidence * 100);
+          return `
+            <tr class="hover:bg-white/[0.02] transition">
+              <td class="py-2.5 px-3.5 font-mono text-[11px] text-zinc-400 whitespace-nowrap">${item.timestamp}</td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="${item.context_crop_url}" class="h-8 w-14 object-cover rounded border border-white/10 cursor-pointer hover:opacity-80 transition" onclick="openModal('${item.context_crop_url}', 'Vehicle: ${item.plate_number}')" title="View vehicle">
+                  <img src="${item.plate_crop_url}" class="h-6 w-12 object-contain rounded border border-white/10 bg-black/60 cursor-pointer hover:opacity-80 transition" onclick="openModal('${item.plate_crop_url}', 'Plate: ${item.plate_number}')" title="View plate">
                 </div>
-                <div class="conf-bar-track">
-                  <div class="conf-bar-fill" style="width:${pct}%;background:${color};"></div>
-                </div>
-              </div>
-
-              <!-- Badges Row -->
-              <div class="flex items-center flex-wrap gap-1.5">
-                ${verifyBadge(d.needs_verification)}
-                ${securityBadge(d.security_flag)}
-              </div>
-            </div>
-
-            <!-- Time -->
-            <div class="text-right xs:self-start">
-              <span class="font-mono text-[10px] text-slate-500">${timeStr}</span>
-            </div>
-
-          </div>
-
-          <!-- Bottom: Vahan Owner & Vehicle Grid -->
-          <div class="mt-3 rounded-lg sm:rounded-xl p-2.5 sm:p-3 grid grid-cols-1 sm:grid-cols-3 gap-2" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.05);">
-            <div>
-              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Vehicle</p>
-              <p class="text-[11.5px] font-semibold text-slate-200 truncate">${d.vehicle_model || '—'}</p>
-            </div>
-            <div>
-              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">Registered Owner</p>
-              <p class="text-[11.5px] font-semibold text-emerald-400 truncate">${d.owner_name || '—'}</p>
-            </div>
-            <div>
-              <p class="text-[8.5px] uppercase font-bold tracking-widest text-slate-500">RTO Address</p>
-              <p class="text-[10.5px] text-slate-400 truncate" title="${d.registered_address}">${d.registered_address || '—'}</p>
-            </div>
-          </div>
-        </div>
-      `;
-
-      feed.insertBefore(card, feed.firstChild);
-      while (feed.children.length > 20) feed.removeChild(feed.lastChild);
-      lucide.createIcons();
-      loadStats();
-      loadHistory();
-    }
-
-    // ─── Camera Switch & Video Upload ──────────────────────────
-    async function switchStream(source, name) {
-      try {
-        const data = await fetch('/api/camera/switch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source, camera_name: name })
-        }).then(r => r.json());
-        document.getElementById('current-channel-label').innerText = data.camera_name;
-        document.getElementById('player-feed-name').innerText      = data.camera_name;
-        const img = document.getElementById('live-video-player');
-        img.src = '/video_feed?t=' + Date.now();
-      } catch (e) { alert('Failed to switch camera: ' + e); }
-    }
-
-    async function uploadVideoFile(input) {
-      if (!input.files || input.files.length === 0) return;
-      const file = input.files[0];
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const channelLabel = document.getElementById('current-channel-label');
-      const originalText = channelLabel.innerText;
-      channelLabel.innerText = `Uploading ${file.name}...`;
-
-      try {
-        const res = await fetch('/api/upload_video', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-          channelLabel.innerText = data.camera_name;
-          document.getElementById('player-feed-name').innerText = data.camera_name;
-          const img = document.getElementById('live-video-player');
-          img.src = '/video_feed?t=' + Date.now();
-        } else {
-          alert('Upload error');
-          channelLabel.innerText = originalText;
-        }
-      } catch (err) {
-        alert('Upload failed: ' + err);
-        channelLabel.innerText = originalText;
+              </td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap">${hsrpBadge(item.plate_number)}</td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap font-sans font-semibold text-xs text-zinc-200 tabular-nums">${pct}%</td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium ${item.is_valid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                  ${item.is_valid ? 'VERIFIED' : 'REVIEW'}
+                </span>
+              </td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium ${isAlert ? 'bg-red-500/15 text-red-400 border border-red-500/25' : 'bg-zinc-800 text-zinc-400'}">
+                  ${item.security_flag}
+                </span>
+              </td>
+              <td class="py-2.5 px-3.5">
+                <div class="font-medium text-zinc-200 text-xs">${item.vehicle_model}</div>
+                <div class="text-[10.5px] text-zinc-500">${item.owner_name}</div>
+              </td>
+              <td class="py-2.5 px-3.5 text-xs text-zinc-400 max-w-[180px] truncate" title="${item.registered_address}">
+                ${item.registered_address}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('Ledger table error:', e);
       }
     }
 
-    // ─── RTSP Modal Handlers ────────────────────────────────────
+
+    // ─── KPI METRICS STATS REFRESH ────────────────────────────────────
+    async function loadStats() {
+      try {
+        const stats = await fetch('/api/stats').then(r => r.json());
+        document.getElementById('stat-total-volume').innerText = stats.total_vehicles_all_time.toLocaleString();
+        document.getElementById('stat-today-volume').innerText = stats.vehicles_today.toLocaleString();
+        document.getElementById('stat-unique-today').innerText = `(${stats.unique_vehicles_today} unique)`;
+        document.getElementById('stat-accuracy').innerText = `${stats.recognition_accuracy}%`;
+        document.getElementById('stat-flagged').innerText = stats.flagged_vehicles.toLocaleString();
+      } catch (_) {}
+    }
+
+
+    // ─── RTSP TEMPLATE SELECTION ──────────────────────────────────────
     function openRtspModal()  { document.getElementById('rtsp-modal').classList.remove('hidden'); }
     function closeRtspModal() { document.getElementById('rtsp-modal').classList.add('hidden'); }
+
     function setRtspTemplate(type) {
-      const i = document.getElementById('modal-rtsp-input');
-      const n = document.getElementById('modal-cam-name');
-      if (type === 'cp_plus')   { i.value = "rtsp://admin:admin123@192.168.1.250:554/cam/realmonitor?channel=1&subtype=0"; n.value = "CP Plus Main Gate"; }
-      if (type === 'hikvision') { i.value = "rtsp://admin:admin123@192.168.1.64:554/Streaming/Channels/101"; n.value = "Hikvision 4MP Lane 1"; }
-      if (type === 'dahua')     { i.value = "rtsp://admin:admin123@192.168.1.108:554/cam/realmonitor?channel=1&subtype=0"; n.value = "Dahua Gate Camera"; }
+      const src = document.getElementById('modal-rtsp-input');
+      const name = document.getElementById('modal-cam-name');
+      if (type === 'kaggle') {
+        src.value = 'test_samples/kaggle_anpr_video.mp4';
+        name.value = 'Kaggle ANPR Video Sample';
+      } else if (type === 'toll_plaza') {
+        src.value = 'test_samples/cars_extended.mp4';
+        name.value = 'Highway Toll Plaza Lane 04';
+      } else if (type === 'webcam') {
+        src.value = '0';
+        name.value = 'Laptop Live Webcam';
+      } else if (type === 'cp_plus') {
+        src.value = 'rtsp://admin:admin123@192.168.1.250:554/cam/realmonitor?channel=1&subtype=0';
+        name.value = 'CP Plus Main Inbound';
+      } else if (type === 'hikvision') {
+        src.value = 'rtsp://admin:admin123@192.168.1.64:554/Streaming/Channels/101';
+        name.value = 'Hikvision 4MP Lane 1';
+      } else if (type === 'dahua') {
+        src.value = 'rtsp://admin:admin123@192.168.1.108:554/cam/realmonitor?channel=1&subtype=0';
+        name.value = 'Dahua Gate Camera';
+      }
     }
+
     function submitCameraSwitch() {
       const source = document.getElementById('modal-rtsp-input').value.trim();
-      const name   = document.getElementById('modal-cam-name').value.trim() || 'CCTV Channel';
-      if (!source) { alert('Enter a stream URL or 0 for Webcam.'); return; }
+      const name   = document.getElementById('modal-cam-name').value.trim() || 'Custom Channel';
+      if (!source) { alert('Please enter a valid stream URL or 0.'); return; }
       switchStream(source, name);
       closeRtspModal();
     }
 
-    // ─── Lightbox Modal ─────────────────────────────────────────
+
+    // ─── LIGHTBOX MODAL ──────────────────────────────────────────────
     function openModal(url, title) {
       document.getElementById('modal-image').src = url;
-      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-title').innerText = title || 'Visual Inspection';
       document.getElementById('image-modal').classList.remove('hidden');
     }
-    function closeModal() { document.getElementById('image-modal').classList.add('hidden'); }
+    function closeModal() {
+      document.getElementById('image-modal').classList.add('hidden');
+    }
 
-    // ─── WebSocket Connection ───────────────────────────────────
+
+    // ─── WEBSOCKET CONNECTION ────────────────────────────────────────
     function connectWebSocket() {
       const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(`${proto}//${location.host}/ws/live`);
-      ws.onmessage = e => { try { prependDossierCard(JSON.parse(e.data)); } catch(_) {} };
-      ws.onclose   = () => setTimeout(connectWebSocket, 3000);
+      ws.onmessage = e => {
+        try {
+          const data = JSON.parse(e.data);
+          handleDossierEvent(data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(connectWebSocket, 3000);
     }
 
-    // ─── Initialise ─────────────────────────────────────────────
+
+    // ─── SEARCH & FILTER LISTENERS ───────────────────────────────────
     document.getElementById('search-input').addEventListener('input', loadHistory);
     document.getElementById('flagged-only-checkbox').addEventListener('change', loadHistory);
 

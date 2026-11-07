@@ -19,6 +19,7 @@ This document serves as the comprehensive log of everything built, tested, debug
 ## 2. Full Chronological Development Log
 
 ### Phase 1: Core AI Pipeline & OCR Engine
+
 1. **Rule Engine & Plate Syntax Validator (`indian_plate_validator.py`)**:
    - Engineered regex parsers covering standard private/commercial Indian patterns (`[A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}`).
    - Added complete coverage for Bharat (`BH`) series registrations.
@@ -108,8 +109,10 @@ This document serves as the comprehensive log of everything built, tested, debug
 
 2. **GitHub Pages Live Interactive Showcase (`docs/index.html`)**:
    - Deployed standalone cloud demonstration build accessible without a local GPU/Python server.
-   - Interactive features: browser webcam feed support (`navigator.mediaDevices.getUserMedia`), periodic simulation engine pushing realistic Indian vehicle dossiers, HSRP plates, and searchable archive.
-   - Live URL: `https://rishukumar.is-a.dev/aegis-anpr/` with `.nojekyll` pipeline bypass.
+   - Live URLs:
+     - **Official Company Domain**: `https://crosstech.in/anpr/` (served seamlessly via CrossTech Website GitHub Pages)
+     - **Developer Showcase**: `https://rishukumar.is-a.dev/aegis-anpr/`
+     - **Default GitHub URL**: `https://rishukumark19.github.io/aegis-anpr/`
 
 ---
 
@@ -157,13 +160,13 @@ d:\Coading Projects\crosstech work\camera\
 
 ## 4. Key Lessons Learned & Gotchas
 
-| Issue / Trap | Root Cause | Solution Implemented |
-|:---|:---|:---|
-| **PaddleOCR 3.x Windows crash** | OneDNN / PIR runtime mismatch in PaddlePaddle 3.x | Locked to `paddleocr==2.8.1` and `paddlepaddle==2.6.2`. |
-| **Grayscale OCR dimension crash** | PaddleOCR expects 3 channels even for grayscale | Convert grayscale back to BGR (`cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)`) before OCR inference. |
-| **Old SQLite Schema error** | Added new columns to ORM without migration script | Re-initialized database with `init_db()` to ensure all columns exist. |
-| **Public RTSP Stream failures** | Most public internet RTSP feeds are blocked by ISP firewalls (Socket Error -138) | Provided local sample video loop and direct webcam mode (`0`) for testing without on-site CCTV. |
-| **Plate Recognition Thresholds** | YOLO misses small plates < 90px width | Physical CCTV installation rule: zoom lens / camera distance must deliver plate width ≥ 130px. |
+| Issue / Trap                      | Root Cause                                                                       | Solution Implemented                                                                            |
+| :-------------------------------- | :------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| **PaddleOCR 3.x Windows crash**   | OneDNN / PIR runtime mismatch in PaddlePaddle 3.x                                | Locked to `paddleocr==2.8.1` and `paddlepaddle==2.6.2`.                                         |
+| **Grayscale OCR dimension crash** | PaddleOCR expects 3 channels even for grayscale                                  | Convert grayscale back to BGR (`cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)`) before OCR inference.  |
+| **Old SQLite Schema error**       | Added new columns to ORM without migration script                                | Re-initialized database with `init_db()` to ensure all columns exist.                           |
+| **Public RTSP Stream failures**   | Most public internet RTSP feeds are blocked by ISP firewalls (Socket Error -138) | Provided local sample video loop and direct webcam mode (`0`) for testing without on-site CCTV. |
+| **Plate Recognition Thresholds**  | YOLO misses small plates < 90px width                                            | Physical CCTV installation rule: zoom lens / camera distance must deliver plate width ≥ 130px.  |
 
 ---
 
@@ -181,3 +184,45 @@ python -m uvicorn server:app --host 0.0.0.0 --port 8000
 # http://localhost:8000
 ```
 
+---
+
+### Phase 4: Toll Plaza & Live Traffic CCTV Ingestion
+
+1. **Downloaded & Verified Intel OpenVINO Toll Plaza CCTV Footage**:
+   - Source: `test_samples/cars_extended.mp4` (640x360 @ 60 FPS, 18,000 frames / 5 minutes continuous toll booth feed).
+   - Ingested directly into `CameraWorker` with high YOLO plate detection confidence (~0.85).
+2. **Added Live Public Traffic CCTV Stream**:
+   - Working live stream link: `http://162.191.11.144:8000/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000`
+   - Verified active HTTP Motion-JPEG highway traffic surveillance feed with OpenCV.
+3. **UI & Server Integration**:
+   - Set default server worker source to Toll Plaza (`test_samples/cars_extended.mp4`).
+   - Added 1-click toolbar buttons: `Toll Plaza CCTV` and `Live Traffic CCTV`.
+   - Added quick-fill templates in the RTSP / IP Camera modal for both feeds.
+
+---
+
+### Phase 5: Kaggle ANPR Ingestion & Multipart Zip Upload
+
+1. **Direct Video & Zip Ingestion API (`server.py`)**:
+   - Created `/api/upload_video` handling multipart form uploads.
+   - Built automatic zip-archive unzipper to handle Kaggle dataset downloads seamlessly.
+   - Dynamically reconfigures running `CameraWorker` to loop the uploaded video.
+2. **Benchmark Video Dataset**:
+   - Extracted and integrated 1280x720 ANPR benchmark video to `test_samples/kaggle_anpr_video.mp4`.
+
+---
+
+### Phase 6: Max-Confidence De-Duplication & Executive Industrial UI
+
+1. **Active Track De-Duplication (`camera_worker.py`)**:
+   - Implemented `SequenceMatcher` similarity clustering (`similarity >= 0.70`, `TRACK_TIMEOUT = 12.0s`).
+   - Multiple passing frames of the same car are de-duplicated into a single DB record/card.
+   - Clearer/higher-confidence frames automatically upgrade existing records in place via WebSocket action `update`.
+2. **Panoramic Vehicle Context Crops**:
+   - Expanded vehicle crops from tight plate bounding box to 2.2x horizontal and 4.5x vertical context (`~255x636 px`), captured at JPEG 95 quality.
+3. **Warm Obsidian & Industrial Zinc UI (`static/index.html`)**:
+   - GPU-accelerated Three.js atmospheric 3D particle constellation background with mouse and touch parallax.
+   - Authentic Indian HSRP license plate component with ultramarine blue `IND` strip.
+   - Clean typographic hierarchy using `Inter` and `JetBrains Mono`.
+   - Executive tabular numerals (`.kpi-val` with OpenType `tabular-nums`) eliminating weird monospace number glyphs.
+   - Zero dead space on mobile and tablet with adaptive dossier container height and horizontal-scrollable channel selector.
